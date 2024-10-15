@@ -79,6 +79,8 @@ Uma explicação melhor da Matriz de Covey [aqui](https://www.flowup.me/blog/mat
 
 </details>
 
+---
+
 ### Ferramentas Utilizadas
 
 <details>
