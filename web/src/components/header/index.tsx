@@ -10,7 +10,7 @@ function header() {
         </div>
         <div className="buttons">
             <button>
-                <p>Create a new task</p>
+                Iniciar Sessão
             </button>
             <button>
                 <img src={moon} alt="moon"/>
@@ -18,6 +18,7 @@ function header() {
             <button>
                 <img src={profile} alt="profile"/>
             </button>
+
         </div>
     </header>
   )
