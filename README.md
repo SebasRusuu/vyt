@@ -91,12 +91,16 @@ Uma explicação melhor da Matriz de Covey [aqui](https://www.flowup.me/blog/mat
 <details>
     <summary> <B> Frontend </B> </summary>
 
- **React - Typescript + bootstrap**
- **Documentação**
- 
+**React - Typescript + bootstrap**
+
+<details>
+    <summary> <B> Documentação </B> </summary>
+
   - [React](https://reactjs.org/)
   - [Typescript](https://www.typescriptlang.org/)
   - [Bootstrap](https://getbootstrap.com/)
+</details>
+
 
 </details>
 
@@ -104,7 +108,19 @@ Uma explicação melhor da Matriz de Covey [aqui](https://www.flowup.me/blog/mat
 
 <details>
     <summary> <B> Backend </B> </summary>
-    Java + postgresql + Docker
+
+**Springboot Maven(Java) + postgresql + Docker** <br>
+**Nginx**
+<details>
+    <summary> <B> Documentação </B> </summary>
+
+- [Springboot](https://spring.io/projects/spring-boot)
+- [Maven](https://maven.apache.org/)
+- [Java](https://www.java.com/pt-BR/)
+- [Postgresql](https://www.postgresql.org/)
+- [Docker](https://www.docker.com/)
+- [Nginx](https://www.nginx.com/)
+</details>
 
 
 </details>
