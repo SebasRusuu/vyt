@@ -1,37 +1,5 @@
-/* Fundo em gradiente para o container principal */
-.gradient-custom {
-    background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
-  }
-  
-
-  
-  /* Campos de formulário */
-  .form-outline input[type="email"],
-  .form-outline input[type="password"] {
-    background: transparent;
-    border: 1px solid #fff;
-    color: #fff;
-    padding: 0.5rem 1rem;
-  }
-  
-  .form-outline .form-label {
-    color: rgba(255, 255, 255, 0.5);
-  }
-  
-  
-  
- 
-  
-  /* Estilos do botão "Sign Up" como link */
-  button.btn.btn-outline-light.btn-sm {
-    border: none;
-    color: #ddd;
-    padding: 0;
-    margin-left: 5px;
-  }
-  
-  button.btn.btn-outline-light.btn-sm:hover {
-    color: #fff;
-    text-decoration: underline;
-  }
-  
+@media (min-width: 1025px) {
+    .h-custom-2 {
+      height: 80%;
+      }
+    }

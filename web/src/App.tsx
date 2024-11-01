@@ -19,7 +19,8 @@ function AppContent() {
 
   return (
     <div className="main-container">
-      {location.pathname !== '/login' && <Header />}
+      {location.pathname !== '/login' && location.pathname !== '/register' && <Header />}
+      
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/login" element={<Login />} />
