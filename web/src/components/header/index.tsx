@@ -45,7 +45,6 @@ function Header() {
                 </div>
             </nav>
             <nav data-mdb-sidenav-init className="sidenav" data-mdb-right="true">
-                {/* Sidebar content goes here */}
             </nav>
         </header>
     );
