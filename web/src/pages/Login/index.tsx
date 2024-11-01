@@ -1,65 +1,61 @@
+// Login.tsx
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './login.css';
+import {
+  MDBBtn,
+  MDBContainer,
+  MDBRow,
+  MDBCol,
+  MDBIcon,
+  MDBInput
+}
+from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
+import './login.css';
 
-function Login() {
+function Login(){
   const navigate = useNavigate();
 
   const handleRegisterClick = () => {
-    navigate('/Register');
+    navigate('/register');
   };
 
   return (
-    <section className="vh-100 gradient-custom">
-      <div className="container py-5 h-100">
-        <div className="row d-flex justify-content-center align-items-center h-100">
-          <div className="col-12 col-md-8 col-lg-6 col-xl-5">
-            <div className="card bg-dark text-white" style={{ borderRadius: '1rem' }}>
-              <div className="card-body p-5 text-center">
-                <div className="mb-md-5 mt-md-4 pb-5">
-                  <h2 className="fw-bold mb-2 text-uppercase">Login</h2>
-                  <p className="text-white-50 mb-5">Please enter your login and password!</p>
+    <MDBContainer fluid>
+      <MDBRow>
 
-                  <div className="form-outline form-white mb-4">
-                    <input type="email" id="typeEmailX" className="form-control form-control-lg" />
-                    <label className="form-label" htmlFor="typeEmailX">Email</label>
-                  </div>
+        <MDBCol sm='6'>
 
-                  <div className="form-outline form-white mb-4">
-                    <input type="password" id="typePasswordX" className="form-control form-control-lg" />
-                    <label className="form-label" htmlFor="typePasswordX">Password</label>
-                  </div>
+          {/* <div className='d-flex flex-row ps-5 pt-5'>
+            <MDBIcon fas icon="crow fa-3x me-3" style={{ color: '#709085' }}/>
+            <span className="h1 fw-bold mb-0">Logo</span>
+          </div> */}
 
-                  <p className="small mb-5 pb-lg-2">
-                    <a className="text-white-50" href="#!">Forgot password?</a>
-                  </p>
+          <div className='d-flex flex-column justify-content-center h-custom-2 w-75 pt-4'>
 
-                  <button className="btn btn-outline-light btn-lg px-5" type="submit">
-                    Login
-                  </button>
+            <h3 className="fw-normal mb-3 ps-5 pb-3" style={{letterSpacing: '1px'}}>Log in</h3>
 
-                </div>
+            <MDBInput wrapperClass='mb-4 mx-5 w-100' label='Email address' id='formControlLg' type='email' size="lg"/>
+            <MDBInput wrapperClass='mb-4 mx-5 w-100' label='Password' id='formControlLg' type='password' size="lg"/>
 
-                <div>
-                  <p className="mb-0">
-                    Don't have an account? 
-                    <a 
-                      onClick={handleRegisterClick} 
-                      className="text-white-50 fw-bold" 
-                      style={{ cursor: 'pointer' }}
-                    >
-                      Sign Up
-                    </a>
-                  </p>
-                </div>
-              </div>
-            </div>
+            <MDBBtn className="mb-4 px-5 mx-5 w-100" color='info' size='lg'>Login</MDBBtn>
+            <p className="small mb-5 pb-lg-3 ms-5"><a className="text-muted" href="#!">Forgot password?</a></p>
+            <p className='ms-5'>Don't have an account? <span onClick={handleRegisterClick} style={{ cursor: 'pointer', textDecoration: 'underline' }} className="link-info">Register here</span></p>
+
           </div>
-        </div>
-      </div>
-    </section>
+
+        </MDBCol>
+
+        <MDBCol sm='6' className='d-none d-sm-block px-0'>
+          <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img3.webp"
+            alt="Login image" className="w-100" style={{objectFit: 'cover', objectPosition: 'left'}} />
+        </MDBCol>
+
+      </MDBRow>
+
+    </MDBContainer>
   );
-}
+};
 
 export default Login;
