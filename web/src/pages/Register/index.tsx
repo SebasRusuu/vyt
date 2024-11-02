@@ -8,7 +8,7 @@ import {
   MDBInput
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
-import banner from '../../assets/icons/banner.webp'
+import teste from '../../assets/icons/teste.png';
 import './register.css';
 
 function Register() {
@@ -30,16 +30,23 @@ function Register() {
             <MDBInput wrapperClass='mb-4 mx-5 w-100' label='Password' id='password' type='password' size="lg" />
             <MDBInput wrapperClass='mb-4 mx-5 w-100' label='Confirm Password' id='confirmPassword' type='password' size="lg" />
 
-            <MDBBtn className="mb-4 px-5 mx-5 w-100" color='info' size='lg'>Register</MDBBtn>
+            <MDBBtn 
+              className="mb-4 px-5 mx-5 w-100" 
+              size="lg" 
+              style={{ backgroundColor: '#61CEE1', color: '#FFFFFF' }}
+            >
+              Register
+            </MDBBtn>
+
             <p className='ms-5'>Already have an account? 
-              <span onClick={handleLoginRedirect} style={{ color: '#0dcaf0', cursor: 'pointer', textDecoration: 'underline' }}> Log in here</span>
+              <span onClick={handleLoginRedirect} style={{ color: '#61CEE1', cursor: 'pointer', textDecoration: 'underline' }}> Log in here</span>
             </p>
           </div>
         </MDBCol>
 
         <MDBCol sm='6' className='d-none d-sm-block px-0'>
-          <img src={banner}
-            alt="Register image" className="w-100" style={{ objectFit: 'cover', objectPosition: 'left' ,backgroundColor: '#f5f5f5'}} />
+          <img src={teste}
+            alt="Register image" className="w-100" style={{ objectFit: 'cover',height: '100vh', objectPosition: 'left' ,backgroundColor: '#ADD8E6'}} />
         </MDBCol>
       </MDBRow>
     </MDBContainer>
