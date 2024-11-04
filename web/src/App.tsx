@@ -9,6 +9,7 @@ import ResetPassword from './components/ResetPassword';
 import Footer from './components/footer';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
+
 const MainPage = () => {
   return (
     <div>

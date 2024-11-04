@@ -7,11 +7,10 @@ import {
   MDBContainer,
   MDBRow,
   MDBCol,
-  MDBIcon,
   MDBInput
 }
 from 'mdb-react-ui-kit';
-import teste from '../../assets/icons/teste.png';
+import teste from '../../assets/teste.png';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import './login.css';
 
