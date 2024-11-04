@@ -1,0 +1,34 @@
+.footer {
+    background-color: #dadadaba;
+    padding: 0px;
+    align-items: center;
+    
+  }
+
+.links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+    color: black;
+
+  }
+
+.links p{
+    padding: 15px;
+    padding-top: 10px;
+    
+}
+
+.container-footer {
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .links a {
+    text-decoration: none;
+  }
+
+    
+  
