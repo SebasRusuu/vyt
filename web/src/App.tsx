@@ -4,6 +4,7 @@ import Home from './pages/home';
 import Header from './components/header';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Footer from './components/footer';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 const MainPage = () => {
@@ -26,6 +27,7 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>
+      <Footer />
     </div>
   );
 }
