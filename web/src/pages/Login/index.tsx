@@ -11,6 +11,7 @@ import {
   MDBInput
 }
 from 'mdb-react-ui-kit';
+import teste from '../../assets/icons/teste.png';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import './login.css';
 
@@ -20,6 +21,10 @@ function Login(){
   const handleRegisterClick = () => {
     navigate('/register');
   };
+
+  const handleForgotPasswordClick = () => {
+    navigate('/reset-email');
+  }
 
   return (
     <MDBContainer fluid>
@@ -39,17 +44,23 @@ function Login(){
             <MDBInput wrapperClass='mb-4 mx-5 w-100' label='Email address' id='formControlLg' type='email' size="lg"/>
             <MDBInput wrapperClass='mb-4 mx-5 w-100' label='Password' id='formControlLg' type='password' size="lg"/>
 
-            <MDBBtn className="mb-4 px-5 mx-5 w-100" color='info' size='lg'>Login</MDBBtn>
-            <p className="small mb-5 pb-lg-3 ms-5"><a className="text-muted" href="#!">Forgot password?</a></p>
-            <p className='ms-5'>Don't have an account? <span onClick={handleRegisterClick} style={{ cursor: 'pointer', textDecoration: 'underline' }} className="link-info">Register here</span></p>
+            <MDBBtn 
+              className="mb-4 px-5 mx-5 w-100" 
+              size="lg" 
+              style={{ backgroundColor: '#61CEE1', color: '#FFFFFF' }}
+              >
+                Login
+            </MDBBtn>
+            <p className="small mb-5 pb-lg-3 ms-5"><span onClick={handleForgotPasswordClick} style={{cursor: 'pointer'}}>Forgot password?</span></p>
+            <p className='ms-5'>Don't have an account? <span onClick={handleRegisterClick} style={{ cursor: 'pointer',color: '#61CEE1', textDecoration: 'underline' }} className="link-info">Register here</span></p>
 
           </div>
 
         </MDBCol>
 
         <MDBCol sm='6' className='d-none d-sm-block px-0'>
-          <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img3.webp"
-            alt="Login image" className="w-100" style={{objectFit: 'cover', objectPosition: 'left'}} />
+          <img src={teste}
+            alt="Register image" className="w-100" style={{ objectFit: 'cover', objectPosition: 'left' ,backgroundColor: '#ADD8E6'}} />
         </MDBCol>
 
       </MDBRow>
