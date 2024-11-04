@@ -1,14 +1,12 @@
 import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Offcanvas } from 'bootstrap';
-import moon from '../../assets/icons/moon.svg';
-import profile from '../../assets/icons/profile.svg';
+
 import './header.css';
 
 function Header() {
     const navigate = useNavigate();
 
-    // Initialize off-canvas manually
     useEffect(() => {
         const offcanvasElement = document.getElementById('navbarOffcanvasLg');
         if (offcanvasElement) {
@@ -20,8 +18,16 @@ function Header() {
         navigate('/login');
     };
 
+    const handleProfileClick = () => {
+        navigate('/profile');
+    };
+
+    const handleCreateTaskClick = () => {
+        navigate('/create-task');
+    }
+
     return (
-        <header className="navbar navbar-expand-lg bg-body-tertiary">
+        <header className="navbar navbar-expand-lg">
             <div className="container-fluid">
                 <Link to="/" className="navbar-brand">VyT</Link>
                 <button
@@ -41,7 +47,6 @@ function Header() {
                     aria-labelledby="navbarOffcanvasLgLabel"
                 >
                     <div className="offcanvas-header">
-                        <h5 className="offcanvas-title" id="offcanvasNavbarLabel">VyT</h5>
                         <button
                             type="button"
                             className="btn-close"
@@ -49,24 +54,24 @@ function Header() {
                             aria-label="Close"
                         ></button>
                     </div>
-                    <div className="offcanvas-body">
+                    <div className="offcanvas-body container" >
                         <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li className="nav-item active">
-                                <Link className="nav-link" to="/">Home</Link>
+                            <div className="navbar-nav justify-content-end flex-grow-1 pe-3 me-3">
+                            <li className="nav-item">
+                                <span className="nav-link" onClick={handleProfileClick}>Profile</span>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link" to="/profile">
-                                    <img src={profile} alt="Profile icon" />
-                                </Link>
+                                <span className="nav-link" onClick={handleLoginClick}>Login</span>
                             </li>
+                            </div>
                             <li className="nav-item">
-                                <Link className="nav-link" to="">
-                                    <img src={moon} alt="Toggle dark mode icon" />
-                                </Link>
-                            </li>
-                            <li className="nav-item">
-                                <span className="nav-link" onClick={handleLoginClick}>
-                                    Login
+                                <span 
+                                    className="nav-link" 
+                                    onClick={handleCreateTaskClick}
+                                    style={{backgroundColor: "#f8f8", borderRadius: "20px",padding: "7px 15px"}}
+                                    
+                                    >
+                                        Create Task
                                 </span>
                             </li>
                         </ul>

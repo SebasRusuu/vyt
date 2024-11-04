@@ -8,7 +8,7 @@ import {
   MDBInput
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
-import teste from '../../assets/icons/teste.png';
+import teste from '../../assets/teste.png';
 import './register.css';
 
 function Register() {

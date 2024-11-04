@@ -1,0 +1,11 @@
+.icon-img {
+    width: 24px;  /* Set your desired icon size */
+    height: 24px;
+    filter: brightness(0); /* Makes the icons black */
+    transition: transform 0.2s ease;
+  }
+  
+  .icon-img:hover {
+    transform: scale(1.1); /* Slight scale effect on hover */
+  }
+  

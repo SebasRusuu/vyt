@@ -8,6 +8,7 @@ import ResetEmail from './components/ResetEmail';
 import ResetPassword from './components/ResetPassword';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
+
 const MainPage = () => {
   return (
     <div>
