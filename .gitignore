@@ -4,6 +4,7 @@
 node_modules
 /.pnp
 .pnp.js
+db_data
 
 # testing
 /coverage
@@ -23,3 +24,5 @@ yarn-debug.log*
 yarn-error.log*
 
 .idea
+
+.env
