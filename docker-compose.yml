@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:latest
+    platform: linux/x86_64
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PORT: ${DB_PORT}
+    volumes:
+      - ${DB_VOLUME}:/var/lib/postgresql/data
+      - ${SQL_SCRIPT}:/docker-entrypoint-initdb.d/${SQL_FILE}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
