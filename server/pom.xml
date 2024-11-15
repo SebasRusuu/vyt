@@ -15,6 +15,7 @@
 		<java.version>17</java.version>
 		<org.springframework.data.version>2024.0.5</org.springframework.data.version>
 		<io.rest-assured.version>5.5.0</io.rest-assured.version>
+		<javax.persistence.version>2.2</javax.persistence.version>
 	</properties>
 	<name>vyt</name>
 	<description>VyT Task Manager</description>
@@ -33,7 +34,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>javax.persistence-api</artifactId>
+			<version>${javax.persistence.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-docker-compose</artifactId>
