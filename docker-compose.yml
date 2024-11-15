@@ -1,10 +1,33 @@
 version: '3.9'
 
 services:
+  web:
+    depends_on:
+      - server
+    platform: linux/x86_64
+    build: ./web
+    restart: on-failure:5
+    ports:
+      - "${WEB_PORT}:${WEB_DOCKER_PORT}"
+    volumes:
+      - ./web:/app
+    
+  server:
+    depends_on:
+      - db
+    build: ./server
+    restart: on-failure:5
+    ports:
+      - "${SV_PORT}:${SV_DOCKER_PORT}"
+    environment:
+     - DB_URL=${DB_URL}
+     - DB_USER=${DB_USER}
+     - DB_PASSWORD=${DB_PASSWORD}
+
   db:
     image: postgres:latest
     platform: linux/x86_64
-    restart: always
+    restart: on-failure:5
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${DB_USER}
