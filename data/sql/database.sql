@@ -11,12 +11,12 @@ CREATE TABLE IF NOT EXISTS tokens(
     token VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES userVyT(user_id)
+    FOREIGN KEY (token_user_id) REFERENCES userVyT(user_id)
     );
 CREATE TABLE if not exists tarefas(
     tarefa_id serial primary key,
     tarefa_user_id int,
-                                      tarefa_titulo VARCHAR(50),
+    tarefa_titulo VARCHAR(50),
     tarefa_descricao VARCHAR(50),
     tarefa_prioridade int,
     tarefa_importancia int,
