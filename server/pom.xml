@@ -83,7 +83,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Spring Data BOM -->
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-bom</artifactId>
