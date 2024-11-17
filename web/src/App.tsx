@@ -33,7 +33,7 @@ function AppContent() {
         <Route path="/reset-email" element={<ResetEmail />} />
         <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
-      <Footer />
+      
     </div>
   );
 }

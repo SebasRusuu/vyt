@@ -10,7 +10,7 @@ import {
   MDBInput
 }
 from 'mdb-react-ui-kit';
-import teste from '../../assets/teste.png';
+import teste from '../../assets/teste6.png';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import './login.css';
 
@@ -19,6 +19,10 @@ function Login(){
 
   const handleRegisterClick = () => {
     navigate('/register');
+  };
+
+  const onClose = () => {
+    navigate('/');
   };
 
   const handleForgotPasswordClick = () => {
@@ -35,6 +39,18 @@ function Login(){
             <MDBIcon fas icon="crow fa-3x me-3" style={{ color: '#709085' }}/>
             <span className="h1 fw-bold mb-0">Logo</span>
           </div> */}
+          <button
+              type="button"
+              className="btn-close"
+              aria-label="Close"
+              onClick={onClose}
+              style={{
+                  position: 'absolute',
+                  top: '10px',
+                  right: '10px',
+                  left: '10px'
+              }}
+          ></button>
 
           <div className='d-flex flex-column justify-content-center h-custom-2 w-75 pt-4'>
 

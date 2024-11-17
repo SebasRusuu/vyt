@@ -8,7 +8,7 @@ import {
   MDBInput
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
-import teste from '../../assets/teste.png';
+import teste from '../../assets/teste3.png';
 
 function ResetEmail() {
   const navigate = useNavigate();
@@ -18,11 +18,26 @@ function ResetEmail() {
 
     navigate('/reset-password'); // Redireciona para a página de redefinição de senha
   };
+  const onClose = () => {
+    navigate('/login');
+  };
 
   return (
     <MDBContainer fluid>
       <MDBRow>
         <MDBCol sm='6'>
+        <button
+            type="button"
+            className="btn-close"
+            aria-label="Close"
+            onClick={onClose}
+            style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            left: '10px'
+            }}
+        ></button>
           <div className='d-flex flex-column justify-content-center h-custom-2 w-75 pt-4'>
             <h3 className="fw-normal mb-3 ps-5 pb-3" style={{ letterSpacing: '1px' }}>Reset Password</h3>
 
