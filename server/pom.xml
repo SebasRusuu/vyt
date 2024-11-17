@@ -20,7 +20,7 @@
         <org.springframework.data.version>2024.0.5</org.springframework.data.version>
         <io.rest-assured.version>5.5.0</io.rest-assured.version>
         <javax.persistence.version>2.2</javax.persistence.version>
-        <org.postgresql.version>42.2.18</org.postgresql.version>
+        <org.postgresql.version>42.6.1</org.postgresql.version>
     </properties>
 
     <dependencies>
@@ -29,14 +29,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
-        <!-- JPA Persistence API -->
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>javax.persistence-api</artifactId>
-            <version>${javax.persistence.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-
         <!-- Spring Boot Docker Compose Support -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -72,6 +68,16 @@
             <artifactId>rest-assured</artifactId>
             <version>${io.rest-assured.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+            <version>${javax.persistence.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
     </dependencies>
 
