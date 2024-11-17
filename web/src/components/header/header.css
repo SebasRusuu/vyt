@@ -1,8 +1,7 @@
 .nav-link{
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .navbar {
-    box-shadow: none !important;
-  }
-  
+  box-shadow: none !important;
+}
