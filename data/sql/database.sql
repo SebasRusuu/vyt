@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS userVyT(
-    user_id SERIAL PRIMARY KEY,
-    user_name VARCHAR(30) ,
-    email VARCHAR(50) UNIQUE ,
-    password_hash VARCHAR(100)
+    user_id SERIAL PRIMARY KEY not null,
+    user_name VARCHAR(30) not null,
+    email VARCHAR(50) UNIQUE not null,
+    password_hash text not null
     );
 
 CREATE TABLE IF NOT EXISTS tokens(
