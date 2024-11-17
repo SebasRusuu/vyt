@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import ResetEmail from './components/ResetEmail';
 import ResetPassword from './components/ResetPassword';
 import Footer from './components/footer';
+import NewTask from './components/NewTask';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 
@@ -23,7 +24,7 @@ function AppContent() {
 
   return (
     <div className="main-container">
-      {location.pathname !== '/login' && location.pathname !== '/register' && location.pathname !== '/reset-email' && location.pathname !== '/reset-password' && <Header />}
+      {location.pathname !== '/login' && location.pathname !== '/register' && location.pathname !== '/reset-email' && location.pathname !== '/reset-password' && <Header /> }
 
       <Routes>
         <Route path="/" element={<MainPage />} />
