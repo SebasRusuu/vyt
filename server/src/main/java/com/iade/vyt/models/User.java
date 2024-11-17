@@ -7,18 +7,22 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 
 @Entity
 @Table(name = "userVyT")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class User {
 
+    public User() {
+    }
+    public User(int userId, String userName, String email, String passwordHash) {
+        this.userId = userId;
+        this.userName = userName;
+        this.email = email;
+        this.passwordHash = passwordHash;
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")

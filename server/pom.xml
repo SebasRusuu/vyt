@@ -19,6 +19,8 @@
         <java.version>17</java.version>
         <org.springframework.data.version>2024.0.5</org.springframework.data.version>
         <io.rest-assured.version>5.5.0</io.rest-assured.version>
+        <javax.persistence.version>2.2</javax.persistence.version>
+        <org.postgresql.version>42.6.1</org.postgresql.version>
     </properties>
 
     <dependencies>
@@ -27,17 +29,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
-        <!-- JPA Persistence API -->
         <dependency>
-
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
-            <version>3.0.0</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-
-       
-
         <!-- Spring Boot Docker Compose Support -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -49,7 +44,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.6.1</version>
+            <version>${org.postgresql.version}</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -74,11 +69,20 @@
             <version>${io.rest-assured.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+            <version>${javax.persistence.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
         <dependencies>
-            <!-- Spring Data BOM -->
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-bom</artifactId>
