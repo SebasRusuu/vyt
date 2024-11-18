@@ -1,27 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Offcanvas } from 'bootstrap';
+import { jwtDecode } from "jwt-decode";
+
 
 import './header.css';
 import NewTask from '../NewTask';
 
+interface DecodedToken {
+    user_name: string;
+    exp: number;
+}
+
 function Header() {
     const navigate = useNavigate();
     const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+    const [userName, setUserName] = useState<string | null>(null);
 
     useEffect(() => {
-        const offcanvasElement = document.getElementById('navbarOffcanvasLg');
-        if (offcanvasElement) {
-            new Offcanvas(offcanvasElement);
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const decoded: DecodedToken = jwtDecode(token);
+                const currentTime = Date.now() / 1000; // Tempo atual em segundos
+                if (decoded.exp > currentTime) {
+                    setUserName(decoded.user_name);
+                } else {
+                    localStorage.removeItem('token'); // Remove token expirado
+                }
+            } catch (error) {
+                console.error('Invalid token:', error);
+            }
         }
     }, []);
 
     const handleLoginClick = () => {
         navigate('/login');
-    };
-
-    const handleProfileClick = () => {
-        navigate('/profile');
     };
 
     const handleCreateTaskClick = () => {
@@ -63,26 +76,27 @@ function Header() {
                         </div>
                         <div className="offcanvas-body container">
                             <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
-                                <div className="navbar-nav justify-content-end flex-grow-1 pe-3 me-3">
-                                    <li className="nav-item">
-                                        <span className="nav-link" onClick={handleProfileClick}>Profile</span>
-                                    </li>
-                                    <li className="nav-item">
-                                        <span className="nav-link" onClick={handleLoginClick}>Login</span>
-                                    </li>
-                                </div>
                                 <li className="nav-item">
-                                    <span
-                                        className="nav-link"
-                                        onClick={handleCreateTaskClick}
-                                        style={{
-                                            backgroundColor: "#f8f8",
-                                            borderRadius: "20px",
-                                            padding: "7px 15px"
-                                        }}
-                                    >
-                                        Create Task
-                                    </span>
+                                    {userName ? (
+                                        <span className="nav-link">Welcome, {userName}</span>
+                                    ) : (
+                                        <span className="nav-link" onClick={handleLoginClick}>
+                      Login
+                    </span>
+                                    )}
+                                </li>
+                                <li className="nav-item">
+                  <span
+                      className="nav-link"
+                      onClick={handleCreateTaskClick}
+                      style={{
+                          backgroundColor: "#f8f8",
+                          borderRadius: "20px",
+                          padding: "7px 15px",
+                      }}
+                  >
+                    Create Task
+                  </span>
                                 </li>
                             </ul>
                         </div>
