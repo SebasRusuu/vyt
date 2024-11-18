@@ -24,16 +24,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User registerUser(String user_name, String email, String password_hash) throws EtAuthException {
+        System.out.println("Registering user: " + user_name + ", Email: " + email);
         Pattern pattern = Pattern.compile("^(.+)@(.+)$");
         if (email != null) email = email.toLowerCase();
-        assert email != null;
         if (!pattern.matcher(email).matches())
             throw new EtAuthException("Invalid email format");
         Integer count = userRepository.getCountByEmail(email);
         if (count > 0)
             throw new EtAuthException("Email already in use");
         Integer userId = userRepository.create(user_name, email, password_hash);
+        System.out.println("User created with ID: " + userId);
         return userRepository.findById(userId);
     }
+
 }
 
