@@ -16,11 +16,13 @@
     <description>VyT Task Manager</description>
 
     <properties>
+        <org.mindrot.version>0.4</org.mindrot.version>
         <java.version>17</java.version>
         <org.springframework.data.version>2024.0.5</org.springframework.data.version>
         <io.rest-assured.version>5.5.0</io.rest-assured.version>
         <javax.persistence.version>2.2</javax.persistence.version>
         <org.postgresql.version>42.6.1</org.postgresql.version>
+        <io.jsonwebtoken.version>0.12.6</io.jsonwebtoken.version>
     </properties>
 
     <dependencies>
@@ -39,6 +41,28 @@
             <artifactId>spring-boot-docker-compose</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+
+
+        <!-- jbcrypt for hashed passwords -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>${org.mindrot.version}</version>
+        </dependency>
+
+        <!-- Json web token -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${io.jsonwebtoken.version}</version>
+        </dependency>
+
 
         <!-- PostgreSQL Driver -->
         <dependency>
