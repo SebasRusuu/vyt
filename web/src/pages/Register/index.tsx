@@ -8,7 +8,7 @@ import {
   MDBInput
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
-import teste from '../../assets/teste.png';
+import teste from '../../assets/teste2.png';
 import './register.css';
 
 function Register() {
@@ -17,15 +17,31 @@ function Register() {
   const handleLoginRedirect = () => {
     navigate('/login');
   };
+  const onClose = () => {
+    navigate('/login');
+  };
 
   return (
     <MDBContainer fluid>
       <MDBRow>
         <MDBCol sm='6'>
+        <button
+            type="button"
+            className="btn-close"
+            aria-label="Close"
+            onClick={onClose}
+            style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            left: '10px'
+
+            }}
+        ></button>
           <div className='d-flex flex-column justify-content-center h-custom-2 w-75 pt-4'>
             <h3 className="fw-normal mb-3 ps-5 pb-3" style={{ letterSpacing: '1px' }}>Register</h3>
 
-            <MDBInput wrapperClass='mb-4 mx-5 w-100' label='Username' id='username' type='text' size="lg" />
+            <MDBInput wrapperClass='mb-4 mx-5 w-100' label='Name' id='Name' type='text' size="lg" />
             <MDBInput wrapperClass='mb-4 mx-5 w-100' label='Email address' id='email' type='email' size="lg" />
             <MDBInput wrapperClass='mb-4 mx-5 w-100' label='Password' id='password' type='password' size="lg" />
             <MDBInput wrapperClass='mb-4 mx-5 w-100' label='Confirm Password' id='confirmPassword' type='password' size="lg" />
