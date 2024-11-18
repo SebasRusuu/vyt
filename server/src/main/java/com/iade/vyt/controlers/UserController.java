@@ -5,10 +5,7 @@ import com.iade.vyt.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,4 +26,9 @@ public class UserController {
         map.put("message", "User registered successfully");
         return new ResponseEntity<>(map, HttpStatus.OK);
     }
+    @GetMapping("/test")
+    public String test() {
+        return "Controller is working!";
+    }
+
 }

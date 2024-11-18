@@ -14,12 +14,18 @@ import java.sql.PreparedStatement;
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
-    private final static String SQL_CREATE = "INSERT INTO userVyT(user_id, user_name, email, password_hash) VALUES(NEXTVAL('ET_USER_SEQ'), ?, ?, ?)";
-    private final static String SQL_COUNT_BY_EMAIL = "SELECT COUNT(*) FROM userVyT WHERE email = ?";
-    private final static String SQL_FIND_BY_ID = "SELECT user_id, user_name, email, password_hash FROM userVyT WHERE user_id = ?";
+    // SQL Statements
+    private static final String SQL_CREATE = "INSERT INTO userVyT(user_name, email, password_hash) VALUES(?, ?, ?)";
+    private static final String SQL_COUNT_BY_EMAIL = "SELECT COUNT(*) FROM userVyT WHERE email = ?";
+    private static final String SQL_FIND_BY_ID = "SELECT user_id, user_name, email, password_hash FROM userVyT WHERE user_id = ?";
+
+    // Injeção do JdbcTemplate
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    public UserRepositoryImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public Integer create(String user_name, String email, String password_hash) throws EtAuthException {
@@ -32,19 +38,20 @@ public class UserRepositoryImpl implements UserRepository {
                 ps.setString(3, password_hash);
                 return ps;
             }, keyHolder);
-            return (Integer) keyHolder.getKeys().get("user_id");
+            return keyHolder.getKey().intValue(); // Retorna o ID gerado
         } catch (Exception e) {
-            throw new EtAuthException("Invalid details. Failed to create account");
+            throw new EtAuthException("Invalid details. Failed to create account: " + e.getMessage());
         }
     }
 
     @Override
     public User findByEmailAndPassword(String email, String password) throws EtAuthException {
+        // Este método não está implementado. Retorne null ou implemente conforme necessário.
         return null;
     }
 
     @Override
-    public final Integer getCountByEmail(String email) {
+    public Integer getCountByEmail(String email) {
         return jdbcTemplate.queryForObject(SQL_COUNT_BY_EMAIL, new Object[]{email}, Integer.class);
     }
 
@@ -53,8 +60,11 @@ public class UserRepositoryImpl implements UserRepository {
         return jdbcTemplate.queryForObject(SQL_FIND_BY_ID, new Object[]{userId}, userRowMapper);
     }
 
-    private final RowMapper<User> userRowMapper = (rs, rowNum) -> new User(rs.getInt("user_id"),
+    // Mapeador de linhas para a entidade User
+    private final RowMapper<User> userRowMapper = (rs, rowNum) -> new User(
+            rs.getInt("user_id"),
             rs.getString("user_name"),
             rs.getString("email"),
-            rs.getString("password_hash"));
+            rs.getString("password_hash")
+    );
 }
