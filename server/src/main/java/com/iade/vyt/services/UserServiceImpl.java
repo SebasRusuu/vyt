@@ -27,6 +27,7 @@ public class UserServiceImpl implements UserService {
         System.out.println("Registering user: " + user_name + ", Email: " + email);
         Pattern pattern = Pattern.compile("^(.+)@(.+)$");
         if (email != null) email = email.toLowerCase();
+        assert email != null;
         if (!pattern.matcher(email).matches())
             throw new EtAuthException("Invalid email format");
         Integer count = userRepository.getCountByEmail(email);
