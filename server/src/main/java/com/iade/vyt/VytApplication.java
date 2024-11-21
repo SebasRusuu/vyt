@@ -13,14 +13,10 @@ public class VytApplication {
 	}
 
 	@Bean
-	public FilterRegistrationBean<AuthFilter> filterRegistrationBean(){
+	public FilterRegistrationBean<AuthFilter> filterRegistrationBean(AuthFilter authFilter){
 		FilterRegistrationBean<AuthFilter> registrationBean = new FilterRegistrationBean<>();
-		AuthFilter authFilter = new AuthFilter();
 		registrationBean.setFilter(authFilter);
-		registrationBean.addUrlPatterns("/api/tarefa/*");
-		registrationBean.addUrlPatterns("/api/horario/*");
-		registrationBean.addUrlPatterns("/api/feedback/*");
+		registrationBean.addUrlPatterns("/api/tarefa/*", "/api/horario/*", "/api/feedback/*");
 		return registrationBean;
 	}
 }
-

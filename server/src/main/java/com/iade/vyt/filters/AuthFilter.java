@@ -3,7 +3,9 @@ package com.iade.vyt.filters;
 import com.iade.vyt.Constants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import jakarta.servlet.FilterChain;
@@ -14,7 +16,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Component
 public class AuthFilter extends GenericFilterBean {
+
+    @Autowired
+    private Constants constants;
+
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
@@ -27,11 +34,10 @@ public class AuthFilter extends GenericFilterBean {
                 String token = authHeaderArr[1];
                 try {
                     Claims claims = Jwts.parser()
-                            .setSigningKey(Constants.API_SECRET_KEY)
+                            .setSigningKey(constants.getApiSecretKey())
                             .build()
-                            .parseSignedClaims(token)
+                            .parseClaimsJws(token)
                             .getBody();
-                    // Ensure the key matches the controller's expectation
                     httpRequest.setAttribute("user_id", Integer.parseInt(claims.get("user_id").toString()));
                 } catch (Exception e) {
                     httpResponse.sendError(HttpStatus.FORBIDDEN.value(), "Invalid/expired token");

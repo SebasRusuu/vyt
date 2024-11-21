@@ -4,7 +4,6 @@ import com.iade.vyt.Constants;
 import com.iade.vyt.models.User;
 import com.iade.vyt.services.UserService;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +20,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private Constants constants;
+
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody Map<String, Object> userMap) {
         String email = (String) userMap.get("email");
@@ -30,7 +32,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public final ResponseEntity<Map<String, String >> registerUser(@RequestBody Map<String, Object> userMap) {
+    public ResponseEntity<Map<String, String>> registerUser(@RequestBody Map<String, Object> userMap) {
         String user_name = (String) userMap.get("user_name");
         String email = (String) userMap.get("email");
         String password_hash = (String) userMap.get("password_hash");
@@ -41,9 +43,9 @@ public class UserController {
     private Map<String, String> generateJWTToken(User user) {
         long timestamp = System.currentTimeMillis();
         String token = Jwts.builder()
-                .signWith(Constants.API_SECRET_KEY) // Use the secure key
+                .signWith(constants.getApiSecretKey())
                 .setIssuedAt(new Date(timestamp))
-                .setExpiration(new Date(timestamp + Constants.TOKEN_VALIDITY))
+                .setExpiration(new Date(timestamp + constants.getTokenValidity()))
                 .claim("user_id", user.getUserId())
                 .claim("email", user.getEmail())
                 .claim("user_name", user.getUserName())
@@ -53,10 +55,8 @@ public class UserController {
         return map;
     }
 
-
     @GetMapping("/test")
     public String test() {
         return "Controller is working!";
     }
-
 }
