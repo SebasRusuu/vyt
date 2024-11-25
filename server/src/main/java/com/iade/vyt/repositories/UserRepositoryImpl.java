@@ -20,13 +20,11 @@ public class UserRepositoryImpl implements UserRepository {
 
     public final static int LOG_ROUNDS = 10;
 
-    // SQL Statements
     private final static String SQL_CREATE = "INSERT INTO userVyT(user_name, email, password_hash) VALUES(?, ?, ?)";
     private final static String SQL_COUNT_BY_EMAIL = "SELECT COUNT(*) FROM userVyT WHERE email = ?";
     private final static String SQL_FIND_BY_ID = "SELECT user_id, user_name, email, password_hash FROM userVyT WHERE user_id = ?";
     private final static String SQL_FIND_BY_EMAIL = "SELECT user_id, user_name, email, password_hash FROM userVyT WHERE email = ?";
 
-    // Injeção do JdbcTemplate
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -35,7 +33,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Integer create(String user_name, String email, String password_hash) throws EtAuthException {
+    public final Integer create(String user_name, String email, String password_hash) throws EtAuthException {
         String hashedPassword = BCrypt.hashpw(password_hash, BCrypt.gensalt(LOG_ROUNDS));
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -53,7 +51,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User findByEmailAndPassword(String email, String password) throws EtAuthException {
+    public final User findByEmailAndPassword(String email, String password) throws EtAuthException {
         try {
             User user = jdbcTemplate.queryForObject(SQL_FIND_BY_EMAIL, new Object[]{email}, userRowMapper);
             if(!BCrypt.checkpw(password, user.getPasswordHash())) {
@@ -67,12 +65,12 @@ public class UserRepositoryImpl implements UserRepository {
 
 
     @Override
-    public Integer getCountByEmail(String email) {
+    public final Integer getCountByEmail(String email) {
         return jdbcTemplate.queryForObject(SQL_COUNT_BY_EMAIL, new Object[]{email}, Integer.class);
     }
 
     @Override
-    public User findById(Integer userId) {
+    public final User findById(Integer userId) {
         return jdbcTemplate.queryForObject(SQL_FIND_BY_ID, new Object[]{userId}, userRowMapper);
     }
 
