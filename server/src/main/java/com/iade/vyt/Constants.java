@@ -2,7 +2,6 @@ package com.iade.vyt;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,17 +12,15 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class Constants {
     @Getter
-    private SecretKey apiSecretKey;
+    private final SecretKey apiSecretKey;
 
     @Getter
-    private long tokenValidity;
+    private final long tokenValidity;
 
-    @Value("${token.validity.hours:2}")
-    private long validityHours;
-
-    @PostConstruct
-    public void init() {
-        apiSecretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        tokenValidity = TimeUnit.HOURS.toMillis(validityHours);
+    public Constants(
+            @Value("${TOKEN_VALIDITY_HOURS:2}") long validityHours
+    ) {
+        this.apiSecretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        this.tokenValidity = TimeUnit.HOURS.toMillis(validityHours);
     }
 }

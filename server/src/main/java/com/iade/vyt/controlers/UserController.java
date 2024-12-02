@@ -3,7 +3,9 @@ package com.iade.vyt.controlers;
 import com.iade.vyt.Constants;
 import com.iade.vyt.models.User;
 import com.iade.vyt.services.UserService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +56,34 @@ public class UserController {
         map.put("token", token);
         return map;
     }
+
+    @GetMapping("/validate-token")
+    public ResponseEntity<?> validateToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            try {
+                Claims claims = Jwts.parserBuilder()
+                        .setSigningKey(constants.getApiSecretKey())
+                        .build()
+                        .parseClaimsJws(token)
+                        .getBody();
+
+                Integer userId = claims.get("user_id", Integer.class);
+                User user = userService.findById(userId);
+                if (user != null) {
+                    return new ResponseEntity<>(HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+                }
+            } catch (Exception e) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
 
     @GetMapping("/test")
     public String test() {

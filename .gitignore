@@ -6,6 +6,8 @@ node_modules
 .pnp.js
 db_data
 
+postgres
+
 # testing
 /coverage
 

@@ -23,7 +23,6 @@ public class UserServiceImpl implements UserService {
             if (email != null) email = email.toLowerCase();
             return userRepository.findByEmailAndPassword(email, password);
         } catch (DataAccessException e) {
-            // Handle database connection exception
             throw new EtAuthException("Database connection error", e);
         }
     }
@@ -31,7 +30,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public User registerUser(String user_name, String email, String password_hash) throws EtAuthException {
         try {
-
             Pattern pattern = Pattern.compile("^(.+)@(.+)$");
             if (email != null) email = email.toLowerCase();
             if (!pattern.matcher(email).matches())
@@ -42,12 +40,14 @@ public class UserServiceImpl implements UserService {
                 throw new EtAuthException("Email already in use");
 
             Integer userId = userRepository.create(user_name, email, password_hash);
-            // logger.info("User created with ID: {}", userId);
-
             return userRepository.findById(userId);
         } catch (DataAccessException e) {
-            // Handle database connection exception
             throw new EtAuthException("Database connection error", e);
         }
+    }
+
+    @Override
+    public User findById(Integer userId) {
+        return userRepository.findById(userId);
     }
 }

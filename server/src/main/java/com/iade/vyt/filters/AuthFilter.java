@@ -33,7 +33,7 @@ public class AuthFilter extends GenericFilterBean {
             if (authHeaderArr.length > 1 && authHeaderArr[1] != null) {
                 String token = authHeaderArr[1];
                 try {
-                    Claims claims = Jwts.parser()
+                    Claims claims = Jwts.parserBuilder()
                             .setSigningKey(constants.getApiSecretKey())
                             .build()
                             .parseClaimsJws(token)

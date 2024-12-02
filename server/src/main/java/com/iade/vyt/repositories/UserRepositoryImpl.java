@@ -11,19 +11,18 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-
 import java.sql.PreparedStatement;
 import java.util.Objects;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
-    public final static int LOG_ROUNDS = 10;
+    public static final int LOG_ROUNDS = 10;
 
-    private final static String SQL_CREATE = "INSERT INTO userVyT(user_name, email, password_hash) VALUES(?, ?, ?)";
-    private final static String SQL_COUNT_BY_EMAIL = "SELECT COUNT(*) FROM userVyT WHERE email = ?";
-    private final static String SQL_FIND_BY_ID = "SELECT user_id, user_name, email, password_hash FROM userVyT WHERE user_id = ?";
-    private final static String SQL_FIND_BY_EMAIL = "SELECT user_id, user_name, email, password_hash FROM userVyT WHERE email = ?";
+    private static final String SQL_CREATE = "INSERT INTO userVyT(user_name, email, password_hash) VALUES(?, ?, ?)";
+    private static final String SQL_COUNT_BY_EMAIL = "SELECT COUNT(*) FROM userVyT WHERE email = ?";
+    private static final String SQL_FIND_BY_ID = "SELECT user_id, user_name, email, password_hash FROM userVyT WHERE user_id = ?";
+    private static final String SQL_FIND_BY_EMAIL = "SELECT user_id, user_name, email, password_hash FROM userVyT WHERE email = ?";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -33,7 +32,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public final Integer create(String user_name, String email, String password_hash) throws EtAuthException {
+    public Integer create(String user_name, String email, String password_hash) throws EtAuthException {
         String hashedPassword = BCrypt.hashpw(password_hash, BCrypt.gensalt(LOG_ROUNDS));
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -44,17 +43,17 @@ public class UserRepositoryImpl implements UserRepository {
                 ps.setString(3, hashedPassword);
                 return ps;
             }, keyHolder);
-            return Objects.requireNonNull(keyHolder.getKey()).intValue(); // Retorna o ID gerado
+            return Objects.requireNonNull(keyHolder.getKey()).intValue();
         } catch (Exception e) {
             throw new EtAuthException("Invalid details. Failed to create account: " + e.getMessage());
         }
     }
 
     @Override
-    public final User findByEmailAndPassword(String email, String password) throws EtAuthException {
+    public User findByEmailAndPassword(String email, String password) throws EtAuthException {
         try {
             User user = jdbcTemplate.queryForObject(SQL_FIND_BY_EMAIL, new Object[]{email}, userRowMapper);
-            if(!BCrypt.checkpw(password, user.getPasswordHash())) {
+            if (!BCrypt.checkpw(password, user.getPasswordHash())) {
                 throw new EtAuthException("Invalid email/password");
             }
             return user;
@@ -63,18 +62,17 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-
     @Override
-    public final Integer getCountByEmail(String email) {
+    public Integer getCountByEmail(String email) {
         return jdbcTemplate.queryForObject(SQL_COUNT_BY_EMAIL, new Object[]{email}, Integer.class);
     }
 
     @Override
-    public final User findById(Integer userId) {
+    public User findById(Integer userId) {
         return jdbcTemplate.queryForObject(SQL_FIND_BY_ID, new Object[]{userId}, userRowMapper);
     }
 
-    // Mapeador de linhas para a entidade User
+
     private final RowMapper<User> userRowMapper = (rs, rowNum) -> new User(
             rs.getInt("user_id"),
             rs.getString("user_name"),
