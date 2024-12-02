@@ -1,35 +1,39 @@
-version: '3.9'
-
 services:
   web:
     depends_on:
       - server
     platform: linux/amd64
     build: ./web
-    restart: on-failure:5
     ports:
       - "${WEB_PORT}:${WEB_DOCKER_PORT}"
     volumes:
       - ./web:/app
-    
+
   server:
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     build: ./server
     ports:
       - "${SV_PORT}:${SV_PORT}"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://vyt-db-1:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
   db:
     image: postgres:latest
     platform: linux/amd64
-    restart: on-failure:5
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_PORT: ${DB_PORT}
     volumes:
-      - ${DB_VOLUME}:/var/lib/postgresql/data
-      - ${SQL_SCRIPT}:/docker-entrypoint-initdb.d/${SQL_FILE}
+      - ./data/sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "${DB_PORT}:5432"
