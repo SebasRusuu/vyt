@@ -93,7 +93,7 @@ function NewTask({ isOpen, onClose }: NewTaskProps) {
                             </select>
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="taskDate" className="form-label">Data</label>
+                            <label htmlFor="taskDate" className="form-label">Duração Máxima</label>
                             <input
                                 type="date"
                                 className="form-control"
@@ -102,6 +102,25 @@ function NewTask({ isOpen, onClose }: NewTaskProps) {
                                     fontSize: isMobile ? '0.9em' : '1em'
                                 }}
                             />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="taskTime" className="form-label">Duração Estimada</label>
+                            <select
+                                className="form-select"
+                                id="taskTime"
+                                style={{
+                                    fontSize: isMobile ? '0.9em' : '1em'
+                                }}
+                            >
+                                <option value="- -:- -">- - : - -</option>
+                                <option value="00:30">00:30</option>
+                                <option value="01:00">01:00</option>
+                                <option value="01:30">01:30</option>
+                                <option value="02:00">02:00</option>
+                                <option value="02:30">02:30</option>
+                                <option value="03:00">03:00</option>
+                                <option value="03:00+">03:00+</option>
+                            </select>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'center' }}>
                             <button
