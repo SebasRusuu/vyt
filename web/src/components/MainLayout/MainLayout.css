@@ -1,0 +1,23 @@
+.main-layout {
+    flex: 1;
+    background-color: #EDEDED;
+    border: 2px solid white;
+    border-radius: 1.5rem;
+    overflow: auto;
+    padding: 20px; 
+  }
+  
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px; 
+  }
+  
+  .title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+  }
+  

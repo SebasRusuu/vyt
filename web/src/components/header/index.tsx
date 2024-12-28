@@ -97,7 +97,7 @@ function Header() {
                             ></button>
                         </div>
                         <div className="offcanvas-body container">
-                            <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
+                            <ul className="navbar-nav justify-content-end flex-grow-1 pe-3 gap-3">
                                 <li className="nav-item">
                                     {userName ? (
                                         <>
@@ -107,16 +107,18 @@ function Header() {
                                     ):(<span className="nav-link" onClick={handleLoginClick}>Login</span>)}
                                 </li>
                                 <li className="nav-item">
-                  <span
-                      className="nav-link"
-                      onClick={handleCreateTaskClick}
-                      style={{
-                          backgroundColor: '#f8f8',
-                          borderRadius: '20px',
-                          padding: '7px 15px',
-                      }}>
-                      Create Task
-                  </span>
+                                    <span
+                                        className="nav-link"
+                                        onClick={handleCreateTaskClick}
+                                        style={{
+                                            backgroundColor: '#3aafae',
+                                            borderRadius: '20px',
+                                            padding: '8px 20px',
+                                            color: '#FFFFFF',
+                                            
+                                        }}>
+                                        Create a New Task
+                                    </span>
                                 </li>
                             </ul>
                         </div>
