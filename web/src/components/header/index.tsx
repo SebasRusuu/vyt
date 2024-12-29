@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {jwtDecode} from 'jwt-decode'; // Corrected import
 import axiosInstance from '../../services/api';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import './header.css';
 import NewTask from '../NewTask';
@@ -106,16 +108,15 @@ function Header() {
                                         </>
                                     ):(<span className="nav-link" onClick={handleLoginClick}>Login</span>)}
                                 </li>
-                                <li className="nav-item">
+                                <li className="nav-item" style={{paddingTop:'5px'}}>
                                     <span
                                         className="nav-link"
                                         onClick={handleCreateTaskClick}
                                         style={{
                                             backgroundColor: '#3aafae',
                                             borderRadius: '20px',
-                                            padding: '8px 20px',
+                                            padding: '3px 15px',
                                             color: '#FFFFFF',
-                                            
                                         }}>
                                         Create a New Task
                                     </span>
