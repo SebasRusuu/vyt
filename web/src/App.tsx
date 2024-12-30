@@ -6,8 +6,6 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ResetEmail from './components/ResetEmail';
 import ResetPassword from './components/ResetPassword';
-import Footer from './components/footer';
-import NewTask from './components/NewTask';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 
