@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
@@ -68,9 +69,15 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User findById(Integer userId) {
-        return jdbcTemplate.queryForObject(SQL_FIND_BY_ID, new Object[]{userId}, userRowMapper);
+    public Optional<User> findById(Integer userId) {
+        try {
+            User user = jdbcTemplate.queryForObject(SQL_FIND_BY_ID, new Object[]{userId}, userRowMapper);
+            return Optional.ofNullable(user);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
+
 
 
     private final RowMapper<User> userRowMapper = (rs, rowNum) -> new User(

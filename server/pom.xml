@@ -16,6 +16,8 @@
     <description>VyT Task Manager</description>
 
     <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <org.mindrot.version>0.4</org.mindrot.version>
         <java.version>17</java.version>
         <org.springframework.data.version>2024.0.5</org.springframework.data.version>
@@ -44,7 +46,7 @@
             <artifactId>spring-boot-docker-compose</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <!-- Add this dependency -->
+
         <dependency>
             <groupId>me.paulschwarz</groupId>
             <artifactId>spring-dotenv</artifactId>
@@ -63,6 +65,8 @@
             <artifactId>jbcrypt</artifactId>
             <version>${org.mindrot.version}</version>
         </dependency>
+
+
 
         <!-- Json web token -->
         <dependency>
@@ -95,8 +99,10 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.30</version>
+            <scope>provided</scope>
         </dependency>
+
 
         <!-- Spring Boot Testing -->
         <dependency>

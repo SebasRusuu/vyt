@@ -3,6 +3,8 @@ package com.iade.vyt.repositories;
 import com.iade.vyt.exceptions.EtAuthException;
 import com.iade.vyt.models.User;
 
+import java.util.Optional;
+
 public interface UserRepository {
     Integer create(String user_name, String email, String password_hash) throws EtAuthException;
 
@@ -10,5 +12,5 @@ public interface UserRepository {
 
     Integer getCountByEmail(String email);
 
-    User findById(Integer userId);
+    Optional<User> findById(Integer userId);
 }

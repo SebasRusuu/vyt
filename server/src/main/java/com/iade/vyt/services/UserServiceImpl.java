@@ -40,7 +40,10 @@ public class UserServiceImpl implements UserService {
                 throw new EtAuthException("Email already in use");
 
             Integer userId = userRepository.create(user_name, email, password_hash);
-            return userRepository.findById(userId);
+
+            // Lidar corretamente com o retorno do findById:
+            return userRepository.findById(userId)
+                    .orElseThrow(() -> new EtAuthException("User not found after creation"));
         } catch (DataAccessException e) {
             throw new EtAuthException("Database connection error", e);
         }
@@ -48,6 +51,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findById(Integer userId) {
-        return userRepository.findById(userId);
+        // Lidar corretamente com o Optional retornado:
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
     }
 }
