@@ -1,28 +1,16 @@
+// User.java
 package com.iade.vyt.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
-import lombok.Data;
-import lombok.Setter;
-import lombok.AccessLevel;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "userVyT")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
-    public User() {
-    }
-    public User(int userId, String userName, String email, String passwordHash) {
-        this.userId = userId;
-        this.userName = userName;
-        this.email = email;
-        this.passwordHash = passwordHash;
-    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")

@@ -1,3 +1,4 @@
+// Constants.java
 package com.iade.vyt;
 
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -10,11 +11,10 @@ import javax.crypto.SecretKey;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@Getter
 public class Constants {
-    @Getter
-    private final SecretKey apiSecretKey;
 
-    @Getter
+    private final SecretKey apiSecretKey;
     private final long tokenValidity;
 
     public Constants(
