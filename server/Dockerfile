@@ -6,6 +6,4 @@ COPY . ./
 
 RUN mvn clean install -DskipTests
 
-COPY . ./
-
 CMD mvn spring-boot:run
