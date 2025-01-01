@@ -42,18 +42,20 @@ const Register: React.FC = () => {
     }
 
     try {
-      const response = await registerUser({
+      // Chama a função de registro
+      await registerUser({
         user_name: formData.user_name,
         email: formData.email,
         password_hash: formData.password_hash,
       });
+
       setSuccess('User registered successfully!');
-      console.log('Token:', response.token);
-      navigate('/login');
+      navigate('/login'); // Redireciona para a página de login
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message); // Exibe o erro no frontend
     }
   };
+
 
   return (
       <MDBContainer fluid>
