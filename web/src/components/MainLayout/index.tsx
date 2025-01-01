@@ -5,10 +5,10 @@ import './MainLayout.css';
 import Filters from "../Filters";
 
 interface Task {
-    tarefa_titulo: string;
-    tarefa_descricao: string;
-    tarefa_criacao_at: string;
-    tarefa_prioridade: string;
+    title: string;
+    description: string;
+    createdAt: string;
+    important: number;
 }
 
 const MainLayout: React.FC = () => {
@@ -19,11 +19,16 @@ const MainLayout: React.FC = () => {
     useEffect(() => {
         const loadTasks = async () => {
             try {
-                const data = await fetchTasks(); // Chama a função do serviço
-                setTasks(data);
+                const data = await fetchTasks();
+                const formattedData = data.map((task: any) => ({
+                    title: task.tarefaTitulo,
+                    description: task.tarefaDescricao,
+                    createdAt: task.tarefaCriacaoAt,
+                    important: task.tarefaImportancia,
+                }));
+                setTasks(formattedData);
             } catch (err: any) {
                 setError(err.message);
-                console.error('Erro ao carregar tarefas:', err);
             } finally {
                 setLoading(false);
             }
@@ -31,6 +36,7 @@ const MainLayout: React.FC = () => {
 
         loadTasks();
     }, []);
+
 
     return (
         <div className="main-layout">
@@ -49,13 +55,12 @@ const MainLayout: React.FC = () => {
                     tasks.map((task, index) => (
                         <ContainerTask
                             key={index}
-                            title={task.tarefa_titulo}
-                            description={task.tarefa_descricao}
-                            createdAt={task.tarefa_criacao_at}
-                            priority={task.tarefa_prioridade}
+                            title={task.title}
+                            description={task.description}
+                            createdAt={task.createdAt}
+                            important={task.important}
                         />
-                    ))
-                )}
+                    )))}
             </div>
         </div>
     );

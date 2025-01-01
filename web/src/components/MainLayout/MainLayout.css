@@ -6,7 +6,16 @@
     overflow: auto;
     padding: 20px; 
   }
-  
+
+.tasks-content {
+    display: flex;
+    flex-wrap: wrap; /* Permite quebra de linha */
+    gap: 16px; /* Espaçamento entre as tarefas */
+    justify-content: flex-start; /* Alinha à esquerda */
+}
+
+
+
   .header-section {
     display: flex;
     justify-content: space-between;

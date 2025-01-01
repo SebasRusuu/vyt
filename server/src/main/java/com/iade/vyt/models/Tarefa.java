@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.sql.Time;
 import java.sql.Timestamp;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "tarefas")
@@ -38,6 +39,8 @@ public class Tarefa {
     @Column(name = "tarefa_preferencia_tempo")
     private Time tarefaPreferenciaTempo;
 
-    @Column(name = "tarefa_criacao_at")
+    @CreationTimestamp
+    @Column(name = "tarefa_criacao_at", updatable = false)
     private Timestamp tarefaCriacaoAt;
 }
+

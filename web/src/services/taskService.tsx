@@ -12,6 +12,7 @@ export const fetchTasks = async (): Promise<any[]> => {
             headers: { Authorization: `Bearer ${token}` },
         });
 
+        console.log("Tarefas recebidas:", response.data); // Log dos dados recebidos
         return response.data; // Retorna os dados das tarefas
     } catch (error: any) {
         throw new Error(
@@ -19,3 +20,4 @@ export const fetchTasks = async (): Promise<any[]> => {
         );
     }
 };
+

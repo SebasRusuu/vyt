@@ -23,8 +23,10 @@ public class    TarefaController {
 
     @GetMapping("/{userId}")
     public List<Tarefa> getTarefasByUser(@PathVariable int userId) {
-        return tarefaService.getTarefasByUserId(userId);
+        List<Tarefa> tarefas = tarefaService.getTarefasByUserId(userId);
+        return tarefas;
     }
+
 
     @PostMapping("/create")
     public ResponseEntity<Tarefa> createTarefa(@RequestBody Tarefa tarefa, HttpServletRequest request) {
