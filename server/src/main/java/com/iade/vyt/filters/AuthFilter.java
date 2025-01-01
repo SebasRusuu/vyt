@@ -1,6 +1,7 @@
 package com.iade.vyt.filters;
 
 import com.iade.vyt.Constants;
+import com.iade.vyt.config.CorsProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,25 @@ public class AuthFilter extends GenericFilterBean {
     @Autowired
     private Constants constants;
 
+
+    @Autowired
+    private CorsProperties corsProperties;
+
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
+
+        // Adiciona os cabeçalhos de CORS
+        httpResponse.setHeader("Access-Control-Allow-Origin", corsProperties.getOriginHost());
+        httpResponse.setHeader("Access-Control-Allow-Methods", corsProperties.getAllowedMethods());
+        httpResponse.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+        httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
+
+        if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+            httpResponse.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
 
         String authHeader = httpRequest.getHeader("Authorization");
         if (authHeader != null) {
@@ -53,4 +69,5 @@ public class AuthFilter extends GenericFilterBean {
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }
+
 }

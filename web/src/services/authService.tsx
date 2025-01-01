@@ -6,12 +6,12 @@ interface RegisterData {
     password_hash: string;
 }
 
-export const registerUser = async (data: RegisterData): Promise<{ token: string }> => {
+export const registerUser = async (data: RegisterData): Promise<void> => {
     try {
-        const response = await api.post('/user/register', data);
-        return response.data; // Token retornado pela API
+        await api.post('/user/register', data); // Registro sem token
+        console.log("Usuário registrado com sucesso");
     } catch (error: any) {
-        throw new Error(error.response?.data?.message || 'Error during registration');
+        throw new Error(error.response?.data?.message || 'Erro durante o registro');
     }
 };
 
@@ -23,8 +23,11 @@ interface LoginData {
 export const loginUser = async (data: LoginData): Promise<{ token: string }> => {
     try {
         const response = await api.post('/user/login', data);
-        return response.data; // Token retornado pelo backend
+        const token = response.data.token; // Token retornado pelo backend
+        localStorage.setItem('authToken', token); // Armazena o token no LocalStorage
+        console.log("Token armazenado com sucesso após login:", token);
+        return { token }; // Retorna o token
     } catch (error: any) {
-        throw new Error(error.response?.data?.message || 'Error during login');
+        throw new Error(error.response?.data?.message || 'Erro durante o login');
     }
 };
