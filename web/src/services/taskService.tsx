@@ -12,7 +12,6 @@ export const fetchTasks = async (): Promise<any[]> => {
             headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log("Tarefas recebidas:", response.data); // Log dos dados recebidos
         return response.data; // Retorna os dados das tarefas
     } catch (error: any) {
         throw new Error(
@@ -20,4 +19,30 @@ export const fetchTasks = async (): Promise<any[]> => {
         );
     }
 };
+
+export const createTask = async (taskData: {
+    tarefaTitulo: string;
+    tarefaDescricao: string;
+    tarefaImportanciaPrioridade: string;
+    tarefaPreferenciaTempo: string;
+}) => {
+    try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            throw new Error('Token JWT não encontrado!');
+        }
+
+        const response = await api.post('/tarefa/create', taskData, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        return response.data; // Retorna a tarefa criada
+    } catch (error: any) {
+        throw new Error(
+            error.response?.data?.message || 'Erro ao criar a tarefa'
+        );
+    }
+};
+
+
 

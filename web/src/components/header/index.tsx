@@ -60,7 +60,12 @@ function Header() {
     };
 
     const handleCreateTaskClick = () => {
-        setIsTaskModalOpen(true); // Open the pop-up
+        if (!userName) {
+            navigate('/login');
+        }
+        else {
+        setIsTaskModalOpen(true);
+        }
     };
 
     const handleCloseTaskModal = () => {

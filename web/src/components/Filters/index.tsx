@@ -1,36 +1,42 @@
 import React, { useState } from "react";
 import "./filters.css";
 
-function Filters() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const priorities = ["All", "Low", "Medium", "High"];
+interface FiltersProps {
+    onFilterChange: (filter: string) => void;
+}
 
-  return (
-    <div className="filter-container">
-      <span
-        className="filter-highlight"
-        style={{
-          width: `calc(100% / ${priorities.length} - 10px)`,
-          height: "calc(100% - 10px)",
-          top: "50%",
-          transform: `translate(calc(${activeIndex * 100}% + ${
-            activeIndex * 10
-          }px), -50%)`,
-        }}
-      ></span>
-      {priorities.map((priority, index) => (
-        <button
-          key={index}
-          className={`filter-button ${
-            activeIndex === index ? "active" : ""
-          }`}
-          onClick={() => setActiveIndex(index)}
-        >
-          {priority}
-        </button>
-      ))}
-    </div>
-  );
+function Filters({ onFilterChange }: FiltersProps) {
+    const [activeIndex, setActiveIndex] = useState(0);
+    const levels = ["Todos", "Baixo", "Médio", "Alto"]; // Valores em português
+
+    const handleFilterClick = (level: string, index: number) => {
+        setActiveIndex(index);
+        onFilterChange(level); // Chama a função passada para aplicar o filtro
+    };
+
+    return (
+        <div className="filters-wrapper">
+            <div className="filter-container">
+        <span
+            className="filter-highlight"
+            style={{
+                transform: `translateX(calc(${activeIndex} * 100%))`, // Movimenta a barra para o botão ativo
+            }}
+        ></span>
+                {levels.map((level, index) => (
+                    <button
+                        key={index}
+                        className={`filter-button ${
+                            activeIndex === index ? "active" : ""
+                        }`}
+                        onClick={() => handleFilterClick(level, index)}
+                    >
+                        {level}
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
 }
 
 export default Filters;

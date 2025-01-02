@@ -1,144 +1,158 @@
-import React, { useEffect } from 'react';
-import './NewTask.css';
+import React, { useState } from "react";
+import "./NewTask.css";
+import { createTask } from "../../services/taskService";
 
 interface NewTaskProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-function NewTask({ isOpen, onClose }: NewTaskProps) {
-    const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 600);
+const NewTask: React.FC<NewTaskProps> = ({ isOpen, onClose }) => {
+    const [taskData, setTaskData] = useState({
+        tarefaTitulo: "",
+        tarefaDescricao: "",
+        tarefaImportancia: "Pouco Importante", // Valor padrão
+        tarefaPrioridade: "Não Urgente", // Valor padrão
+        tarefaPreferenciaTempo: "00:30:00", // Valor padrão
+    });
+    const [error, setError] = useState<string | null>(null);
 
-    const handleResize = () => {
-        setIsMobile(window.innerWidth <= 600);
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    ) => {
+        setTaskData({
+            ...taskData,
+            [e.target.name]: e.target.value,
+        });
     };
 
-    useEffect(() => {
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
 
-    if (!isOpen) return null; // Retorna `null` se o pop-up estiver fechado
+        try {
+            // Determinar a combinação de Importância & Prioridade
+            let importanciaPrioridade = "Baixo";
+            if (
+                taskData.tarefaImportancia === "Importante" &&
+                taskData.tarefaPrioridade === "Urgente"
+            ) {
+                importanciaPrioridade = "Alto";
+            } else if (
+                taskData.tarefaImportancia === "Importante" ||
+                taskData.tarefaPrioridade === "Urgente"
+            ) {
+                importanciaPrioridade = "Médio";
+            }
+
+            await createTask({
+                tarefaTitulo: taskData.tarefaTitulo,
+                tarefaDescricao: taskData.tarefaDescricao,
+                tarefaImportanciaPrioridade: importanciaPrioridade,
+                tarefaPreferenciaTempo: taskData.tarefaPreferenciaTempo,
+            });
+
+            onClose(); // Fecha o modal após criar a tarefa
+        } catch (err: any) {
+            setError(err.message);
+        }
+    };
+
+    if (!isOpen) return null;
 
     return (
-        <div className={`app-container overlay`}>
-            <div className="popup-overlay">
-                <div className="popup">
-                    <button
-                        type="button"
-                        className="btn-close"
-                        aria-label="Close"
-                        onClick={onClose}
-                        style={{
-                            position: 'absolute',
-                            top: '10px',
-                            right: '10px'
-                        }}
-                    ></button>
-                    <form>
-                        <div className="mb-3">
-                            <label
-                                htmlFor="taskName"
-                                className="form-label"
-                                style={{ padding: '5px 0' }}
-                            >
-                                Nome da Tarefa
-                            </label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="taskName"
-                                style={{
-                                    fontSize: isMobile ? '0.9em' : '1em'
-                                }}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="taskDescription" className="form-label">Descrição</label>
-                            <textarea
-                                className="form-control"
-                                id="taskDescription"
-                                rows={3}
-                                style={{
-                                    fontSize: isMobile ? '0.9em' : '1em'
-                                }}
-                            ></textarea>
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="taskPriority" className="form-label">Prioridade</label>
-                            <select
-                                className="form-select"
-                                id="taskPriority"
-                                style={{
-                                    fontSize: isMobile ? '0.9em' : '1em'
-                                }}
-                            >
-                                <option value="null">- - - - -</option>
-                                <option value="low">Não-Urgente</option>
-                                <option value="high">Urgente</option>
-                            </select>
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="taskImportancia" className="form-label">Importância</label>
-                            <select
-                                className="form-select"
-                                id="taskImportancia"
-                                style={{
-                                    fontSize: isMobile ? '0.9em' : '1em'
-                                }}
-                            >
-                                <option value="null">- - - - -</option>
-                                <option value="low">Não-Importante</option>
-                                <option value="high">Importante</option>
-                            </select>
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="taskDate" className="form-label">Duração Máxima</label>
-                            <input
-                                type="date"
-                                className="form-control"
-                                id="taskDate"
-                                style={{
-                                    fontSize: isMobile ? '0.9em' : '1em'
-                                }}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="taskTime" className="form-label">Duração Estimada</label>
-                            <select
-                                className="form-select"
-                                id="taskTime"
-                                style={{
-                                    fontSize: isMobile ? '0.9em' : '1em'
-                                }}
-                            >
-                                <option value="- -:- -">- - : - -</option>
-                                <option value="00:30">00:30</option>
-                                <option value="01:00">01:00</option>
-                                <option value="01:30">01:30</option>
-                                <option value="02:00">02:00</option>
-                                <option value="02:30">02:30</option>
-                                <option value="03:00">03:00</option>
-                                <option value="03:00+">03:00+</option>
-                            </select>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="submit-button"
-                                style={{
-                                    width: isMobile ? '100%' : 'auto'
-                                }}
-                            >
-                                Submit
-                            </button>
-                        </div>
-                    </form>
-                </div>
+        <div className="popup-overlay">
+            <div className="popup">
+                <button
+                    type="button"
+                    className="btn-close"
+                    aria-label="Close"
+                    onClick={onClose}
+                ></button>
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-3">
+                        <label htmlFor="tarefaTitulo" className="form-label">
+                            Título
+                        </label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="tarefaTitulo"
+                            name="tarefaTitulo"
+                            value={taskData.tarefaTitulo}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="tarefaDescricao" className="form-label">
+                            Descrição
+                        </label>
+                        <textarea
+                            className="form-control"
+                            id="tarefaDescricao"
+                            name="tarefaDescricao"
+                            rows={3}
+                            value={taskData.tarefaDescricao}
+                            onChange={handleChange}
+                            required
+                        ></textarea>
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="tarefaImportancia" className="form-label">
+                            Importância
+                        </label>
+                        <select
+                            className="form-select"
+                            id="tarefaImportancia"
+                            name="tarefaImportancia"
+                            value={taskData.tarefaImportancia}
+                            onChange={handleChange}
+                        >
+                            <option value="Pouco Importante">Pouco Importante</option>
+                            <option value="Importante">Importante</option>
+                        </select>
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="tarefaPrioridade" className="form-label">
+                            Prioridade
+                        </label>
+                        <select
+                            className="form-select"
+                            id="tarefaPrioridade"
+                            name="tarefaPrioridade"
+                            value={taskData.tarefaPrioridade}
+                            onChange={handleChange}
+                        >
+                            <option value="Não Urgente">Não Urgente</option>
+                            <option value="Urgente">Urgente</option>
+                        </select>
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="tarefaPreferenciaTempo" className="form-label">
+                            Duração
+                        </label>
+                        <select
+                            className="form-select"
+                            id="tarefaPreferenciaTempo"
+                            name="tarefaPreferenciaTempo"
+                            value={taskData.tarefaPreferenciaTempo}
+                            onChange={handleChange}
+                        >
+                            <option value="00:30:00">30 minutos</option>
+                            <option value="01:00:00">1 hora</option>
+                            <option value="01:30:00">1h 30min</option>
+                            <option value="02:00:00">2 horas</option>
+                        </select>
+                    </div>
+                    <button type="submit" className="submit-button">
+                        Criar Tarefa
+                    </button>
+                </form>
+                {error && <p style={{ color: "red" }}>{error}</p>}
             </div>
         </div>
     );
-}
+};
 
 export default NewTask;

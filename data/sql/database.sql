@@ -18,8 +18,7 @@ CREATE TABLE if not exists tarefas(
     tarefa_user_id int,
     tarefa_titulo VARCHAR(70),
     tarefa_descricao VARCHAR(255),
-    tarefa_prioridade int,
-    tarefa_importancia int,
+    tarefa_importancia_prioridade VARCHAR(20),
     tarefa_preferencia_tempo time,
     tarefa_criacao_at timestamp,
     FOREIGN KEY (tarefa_user_id) REFERENCES uservyt(user_id)
