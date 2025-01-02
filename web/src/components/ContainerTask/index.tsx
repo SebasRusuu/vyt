@@ -6,20 +6,24 @@ interface TaskProps {
     title: string;
     description: string;
     createdAt: string;
-    important: number;
+    importanciaPrioridade: string;
 }
 
-const getImportantLabel = (important: number) => {
-    if (important <= 2) return "Low";
-    if (important === 3) return "Medium";
-    return "High";
+const getImportantLabel = (importanciaPrioridade: string) => importanciaPrioridade;
+
+const getImportantColor = (importanciaPrioridade: string) => {
+    switch (importanciaPrioridade) {
+        case "Alto":
+            return "high-important";
+        case "Médio":
+            return "medium-important";
+        case "Baixo":
+            return "low-important";
+        default:
+            return "default-important";
+    }
 };
 
-const getImportantColor = (important: number) => {
-    if (important <= 2) return "low-important";
-    if (important === 3) return "medium-important";
-    return "high-important";
-};
 
 const formatCreatedAt = (createdAt: string | undefined): string => {
     if (!createdAt) return "No date available";
@@ -40,15 +44,15 @@ const formatCreatedAt = (createdAt: string | undefined): string => {
 };
 
 
-const ContainerTask: React.FC<TaskProps> = ({ title, description, createdAt, important }) => {
+const ContainerTask: React.FC<TaskProps> = ({ title, description, createdAt, importanciaPrioridade }) => {
     return (
         <div className="task-container">
             <h4 className="task-title">{title}</h4>
             <p className="task-description">{description}</p>
             <div className="task-footer">
                 <p className="task-date">{formatCreatedAt(createdAt)}</p>
-                <p className={`task-important ${getImportantColor(important)}`}>
-                    {getImportantLabel(important)}
+                <p className={`task-important ${getImportantColor(importanciaPrioridade)}`}>
+                    {getImportantLabel(importanciaPrioridade)}
                 </p>
                 <div className="task-actions">
                     <button className="edit-task">

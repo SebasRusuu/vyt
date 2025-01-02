@@ -30,11 +30,8 @@ public class Tarefa {
     @Column(name = "tarefa_descricao")
     private String tarefaDescricao;
 
-    @Column(name = "tarefa_prioridade")
-    private int tarefaPrioridade;
-
-    @Column(name = "tarefa_importancia")
-    private int tarefaImportancia;
+    @Column(name = "tarefa_importancia_prioridade")
+    private String tarefaImportanciaPrioridade;
 
     @Column(name = "tarefa_preferencia_tempo")
     private Time tarefaPreferenciaTempo;

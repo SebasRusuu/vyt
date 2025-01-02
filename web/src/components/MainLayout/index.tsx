@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import ContainerTask from '../ContainerTask';
-import { fetchTasks } from '../../services/taskService';
-import './MainLayout.css';
+import React, { useEffect, useState } from "react";
+import ContainerTask from "../ContainerTask";
+import { fetchTasks } from "../../services/taskService";
+import "./MainLayout.css";
 import Filters from "../Filters";
 
 interface Task {
     title: string;
     description: string;
     createdAt: string;
-    important: number;
+    importanciaPrioridade: string; // Campo ajustado para refletir a nova estrutura
 }
 
 const MainLayout: React.FC = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
+    const [filteredTasks, setFilteredTasks] = useState<Task[]>([]); // Tarefas filtradas
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -24,9 +25,10 @@ const MainLayout: React.FC = () => {
                     title: task.tarefaTitulo,
                     description: task.tarefaDescricao,
                     createdAt: task.tarefaCriacaoAt,
-                    important: task.tarefaImportancia,
+                    importanciaPrioridade: task.tarefaImportanciaPrioridade,
                 }));
                 setTasks(formattedData);
+                setFilteredTasks(formattedData); // Inicializa com todas as tarefas
             } catch (err: any) {
                 setError(err.message);
             } finally {
@@ -37,30 +39,40 @@ const MainLayout: React.FC = () => {
         loadTasks();
     }, []);
 
+    const handleFilterChange = (filter: string) => {
+        if (filter === "Todos") {
+            setFilteredTasks(tasks); // Mostra todas as tarefas
+        } else {
+            setFilteredTasks(
+                tasks.filter((task) => task.importanciaPrioridade === filter)
+            );
+        }
+    };
 
     return (
         <div className="main-layout">
             <div className="header-section">
-                <h1 className="title">All Tasks</h1>
-                <Filters/>
+                <h1 className="title">Tarefas</h1>
+                <Filters onFilterChange={handleFilterChange} />
             </div>
             <div className="tasks-content">
                 {loading ? (
                     <p>Carregando tarefas...</p>
                 ) : error ? (
-                    <p style={{ color: 'red' }}>{error}</p>
-                ) : tasks.length === 0 ? (
+                    <p style={{ color: "red" }}>{error}</p>
+                ) : filteredTasks.length === 0 ? (
                     <p>Nenhuma tarefa encontrada.</p>
                 ) : (
-                    tasks.map((task, index) => (
+                    filteredTasks.map((task, index) => (
                         <ContainerTask
                             key={index}
                             title={task.title}
                             description={task.description}
                             createdAt={task.createdAt}
-                            important={task.important}
+                            importanciaPrioridade={task.importanciaPrioridade}
                         />
-                    )))}
+                    ))
+                )}
             </div>
         </div>
     );

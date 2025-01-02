@@ -30,19 +30,19 @@ public class    TarefaController {
 
     @PostMapping("/create")
     public ResponseEntity<Tarefa> createTarefa(@RequestBody Tarefa tarefa, HttpServletRequest request) {
-        // Extrair o userId do token JWT
         Integer userId = (Integer) request.getAttribute("user_id");
 
         if (userId == null) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN); // Token inválido
         }
 
-        // Associar o userId à tarefa
         tarefaService.associateTarefaWithUser(tarefa, userId);
 
-        // Salvar a tarefa no banco de dados
+        // O frontend já deve enviar "Alto", "Médio" ou "Baixo" como `tarefaImportanciaPrioridade`
         Tarefa createdTarefa = tarefaService.createTarefa(tarefa);
         return new ResponseEntity<>(createdTarefa, HttpStatus.CREATED);
     }
+
+
 }
 
