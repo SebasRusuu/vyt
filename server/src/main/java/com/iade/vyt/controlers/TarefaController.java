@@ -43,6 +43,12 @@ public class    TarefaController {
         return new ResponseEntity<>(createdTarefa, HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/delete/{tarefaId}")
+    public ResponseEntity<Void> deleteTarefa(@PathVariable int tarefaId) {
+        tarefaService.deleteTarefa(tarefaId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content
+    }
+
 
 }
 

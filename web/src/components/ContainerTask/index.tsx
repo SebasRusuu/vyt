@@ -1,8 +1,10 @@
 import React from 'react';
 import './ContainerTask.css';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import {deleteTask} from "../../services/taskService";
 
 interface TaskProps {
+    taskId: number;
     title: string;
     description: string;
     createdAt: string;
@@ -44,7 +46,7 @@ const formatCreatedAt = (createdAt: string | undefined): string => {
 };
 
 
-const ContainerTask: React.FC<TaskProps> = ({ title, description, createdAt, importanciaPrioridade }) => {
+const ContainerTask: React.FC<TaskProps> = ({ taskId, title, description, createdAt, importanciaPrioridade }) => {
     return (
         <div className="task-container">
             <h4 className="task-title">{title}</h4>
@@ -58,8 +60,16 @@ const ContainerTask: React.FC<TaskProps> = ({ title, description, createdAt, imp
                     <button className="edit-task">
                         <FaEdit />
                     </button>
-                    <button className="delete-task">
-                        <FaTrashAlt />
+                    <button
+                        className="delete-task"
+                        onClick={() => deleteTask(taskId).then(() => {
+                            console.log('Tarefa excluída com sucesso!');
+                            // Atualize a lista de tarefas, se necessário
+                        }).catch((error) => {
+                            console.log(error.message);
+                        })}
+                    >
+                        <FaTrashAlt/>
                     </button>
                 </div>
             </div>

@@ -5,6 +5,7 @@ import "./MainLayout.css";
 import Filters from "../Filters";
 
 interface Task {
+    taskId: number;
     title: string;
     description: string;
     createdAt: string;
@@ -22,6 +23,7 @@ const MainLayout: React.FC = () => {
             try {
                 const data = await fetchTasks();
                 const formattedData = data.map((task: any) => ({
+                    taskId: task.tarefaId,
                     title: task.tarefaTitulo,
                     description: task.tarefaDescricao,
                     createdAt: task.tarefaCriacaoAt,
@@ -66,6 +68,7 @@ const MainLayout: React.FC = () => {
                     filteredTasks.map((task, index) => (
                         <ContainerTask
                             key={index}
+                            taskId={task.taskId}
                             title={task.title}
                             description={task.description}
                             createdAt={task.createdAt}
