@@ -52,7 +52,8 @@ const NewTask: React.FC<NewTaskProps> = ({ isOpen, onClose }) => {
                 tarefaPreferenciaTempo: taskData.tarefaPreferenciaTempo,
             });
 
-            onClose(); // Fecha o modal após criar a tarefa
+            onClose();
+            window.location.reload();
         } catch (err: any) {
             setError(err.message);
         }
