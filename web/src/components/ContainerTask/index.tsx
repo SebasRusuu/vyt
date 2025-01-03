@@ -37,9 +37,9 @@ const formatCreatedAt = (createdAt: string | undefined): string => {
         const today = new Date();
         const differenceInDays = Math.floor((today.getTime() - taskDate.getTime()) / (1000 * 3600 * 24));
 
-        if (differenceInDays === 0) return "Today";
-        if (differenceInDays === 1) return "Yesterday";
-        return `${differenceInDays} days ago`;
+        if (differenceInDays === 0) return "Hoje";
+        if (differenceInDays === 1) return "Ontem";
+        return `${differenceInDays} dias atrás`;
     } catch (e) {
         return "Invalid date";
     }
@@ -64,7 +64,7 @@ const ContainerTask: React.FC<TaskProps> = ({ taskId, title, description, create
                         className="delete-task"
                         onClick={() => deleteTask(taskId).then(() => {
                             console.log('Tarefa excluída com sucesso!');
-                            // Atualize a lista de tarefas, se necessário
+                            window.location.reload();
                         }).catch((error) => {
                             console.log(error.message);
                         })}
