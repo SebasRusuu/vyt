@@ -44,5 +44,24 @@ export const createTask = async (taskData: {
     }
 };
 
+export const deleteTask = async (taskId: number) => {
+    try{
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            throw new Error('Token JWT não encontrado!');
+        }
+
+        const response = await api.delete(`/tarefa/delete/${taskId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        return response.data;
+        // Retorna a tarefa eliminada
+    }catch (error: any) {
+        throw new Error(
+            error.response?.data?.message || 'Erro ao eliminar a tarefa'
+        );
+    }
+}
 
 

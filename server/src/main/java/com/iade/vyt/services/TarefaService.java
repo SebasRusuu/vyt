@@ -39,4 +39,11 @@ public class TarefaService {
     public Tarefa createTarefa(Tarefa tarefa) {
         return tarefaRepository.save(tarefa);
     }
+
+    public Tarefa deleteTarefa(int tarefaId) {
+        Tarefa tarefa = tarefaRepository.findById(tarefaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada."));
+        tarefaRepository.delete(tarefa);
+        return tarefa;
+    }
 }
