@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react'; // Adicionado: useState para controlar o pop-up
 import './ContainerTask.css';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
-import {deleteTask} from "../../services/taskService";
+import { deleteTask } from "../../services/taskService";
+import EditTask from '../EditTask'; // Adicionado: Importação do componente EditTask
 
 interface TaskProps {
     taskId: number;
@@ -26,7 +27,6 @@ const getImportantColor = (importanciaPrioridade: string) => {
     }
 };
 
-
 const formatCreatedAt = (createdAt: string | undefined): string => {
     if (!createdAt) return "No date available";
 
@@ -45,8 +45,9 @@ const formatCreatedAt = (createdAt: string | undefined): string => {
     }
 };
 
-
 const ContainerTask: React.FC<TaskProps> = ({ taskId, title, description, createdAt, importanciaPrioridade }) => {
+    const [isEditPopupOpen, setIsEditPopupOpen] = useState(false); // Adicionado: Estado para controlar o pop-up
+
     return (
         <div className="task-container">
             <h4 className="task-title">{title}</h4>
@@ -57,7 +58,10 @@ const ContainerTask: React.FC<TaskProps> = ({ taskId, title, description, create
                     {getImportantLabel(importanciaPrioridade)}
                 </p>
                 <div className="task-actions">
-                    <button className="edit-task">
+                    <button
+                        className="edit-task"
+                        onClick={() => setIsEditPopupOpen(true)} // Adicionado: Abre o pop-up de edição
+                    >
                         <FaEdit />
                     </button>
                     <button
@@ -69,10 +73,18 @@ const ContainerTask: React.FC<TaskProps> = ({ taskId, title, description, create
                             console.log(error.message);
                         })}
                     >
-                        <FaTrashAlt/>
+                        <FaTrashAlt />
                     </button>
                 </div>
             </div>
+
+            {/* Adicionado: Renderização do pop-up de edição */}
+            {isEditPopupOpen && (
+                <EditTask
+                    taskId={taskId} // Passa o ID da tarefa para o componente EditTask
+                    onClose={() => setIsEditPopupOpen(false)} // Fecha o pop-up ao clicar
+                />
+            )}
         </div>
     );
 };

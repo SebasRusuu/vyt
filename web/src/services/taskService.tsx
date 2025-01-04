@@ -64,4 +64,36 @@ export const deleteTask = async (taskId: number) => {
     }
 }
 
+// Função para buscar uma tarefa pelo ID
+export const getTaskById = async (taskId: number) => {
+    const response = await fetch(`/api/tarefa/${taskId}`, {
+        method: "GET", // Método HTTP para obter dados
+        headers: {
+            "Content-Type": "application/json", // Define o tipo de conteúdo como JSON
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error("Erro ao buscar a tarefa."); // Lança erro se a resposta não for bem-sucedida
+    }
+
+    return await response.json(); // Retorna os dados da tarefa
+};
+
+// Função para editar uma tarefa existente
+export const editTask = async (taskId: number, updatedTask: any) => {
+    const response = await fetch(`/api/tarefa/update/${taskId}`, {
+        method: "PUT", // Método HTTP para atualização
+        headers: {
+            "Content-Type": "application/json", // Define o tipo de conteúdo como JSON
+        },
+        body: JSON.stringify(updatedTask), // Envia os dados atualizados
+    });
+
+    if (!response.ok) {
+        throw new Error("Erro ao editar a tarefa."); // Lança erro se a resposta não for bem-sucedida
+    }
+
+    return await response.json(); // Retorna os dados atualizados da tarefa
+};
 
