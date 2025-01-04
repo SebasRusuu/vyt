@@ -4,6 +4,7 @@ import {jwtDecode} from 'jwt-decode'; // Corrected import
 import axiosInstance from '../../services/api';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import logo from '../../assets/MiniVerde.png';
 
 import './header.css';
 import NewTask from '../NewTask';
@@ -76,7 +77,8 @@ function Header() {
         <>
             <header className="navbar navbar-expand-lg">
                 <div className="container-fluid">
-                    <Link to="/" className="navbar-brand">
+                    <Link to="/" className="navbar-brand" style={{ padding: '10px', fontSize: '25px' }}>
+                        <img src={logo} alt="VyT" style={{ height: '50px', paddingRight: '10px' }} />
                         VyT
                     </Link>
                     <button
