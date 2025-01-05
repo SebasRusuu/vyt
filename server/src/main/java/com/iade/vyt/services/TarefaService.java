@@ -60,4 +60,20 @@ public class TarefaService {
         return tarefaRepository.findById(tarefaId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada."));
     }
+
+    public void markAsCompleted(int tarefaId) {
+        Tarefa tarefa = tarefaRepository.findById(tarefaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada."));
+        tarefa.setTarefaCompletada(true); // Marca como completada
+        tarefaRepository.save(tarefa);
+    }
+
+    public List<Tarefa> getCompletedTarefasByUserId(int userId) {
+        return tarefaRepository.findByTarefaUserUserIdAndTarefaCompletada(userId, true);
+    }
+
+    public List<Tarefa> getIncompleteTarefasByUserId(int userId) {
+        return tarefaRepository.findByTarefaUserUserIdAndTarefaCompletada(userId, false);
+    }
+
 }

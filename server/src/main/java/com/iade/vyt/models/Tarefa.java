@@ -39,5 +39,8 @@ public class Tarefa {
     @CreationTimestamp
     @Column(name = "tarefa_criacao_at", updatable = false)
     private Timestamp tarefaCriacaoAt;
+
+    @Column(name = "tarefa_completada")
+    private boolean tarefaCompletada;
 }
 

@@ -26,7 +26,15 @@ public class    TarefaController {
         return tarefaService.getTarefasByUserId(userId);
     }
 
+    @GetMapping("/completed/{userId}")
+    public List<Tarefa> getCompletedTarefasByUser(@PathVariable int userId) {
+        return tarefaService.getCompletedTarefasByUserId(userId);
+    }
 
+    @GetMapping("/incomplete/{userId}")
+    public List<Tarefa> getIncompleteTarefasByUser(@PathVariable int userId) {
+        return tarefaService.getIncompleteTarefasByUserId(userId);
+    }
 
     @PostMapping("/create")
     public ResponseEntity<Tarefa> createTarefa(@RequestBody Tarefa tarefa, HttpServletRequest request) {
@@ -37,8 +45,7 @@ public class    TarefaController {
         }
 
         tarefaService.associateTarefaWithUser(tarefa, userId);
-
-        // O frontend já deve enviar "Alto", "Médio" ou "Baixo" como `tarefaImportanciaPrioridade`
+        tarefa.setTarefaCompletada(false);
         Tarefa createdTarefa = tarefaService.createTarefa(tarefa);
         return new ResponseEntity<>(createdTarefa, HttpStatus.CREATED);
     }
@@ -58,6 +65,11 @@ public class    TarefaController {
     @GetMapping("/id/{tarefaId}")
     public Tarefa getTarefaById(@PathVariable int tarefaId) {
         return tarefaService.getTarefaById(tarefaId);
+    }
+    @PutMapping("/complete/{tarefaId}")
+    public ResponseEntity<Void> markTarefaAsCompleted(@PathVariable int tarefaId) {
+        tarefaService.markAsCompleted(tarefaId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

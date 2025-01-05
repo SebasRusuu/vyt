@@ -11,4 +11,5 @@ import java.util.List;
 @Repository
 public interface TarefaRepository extends JpaRepository<Tarefa, Integer> {
     List<Tarefa> findByTarefaUserUserId(int userId);
+    List<Tarefa> findByTarefaUserUserIdAndTarefaCompletada(int userId, boolean completada);
 }
