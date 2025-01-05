@@ -30,10 +30,6 @@
     display: block; /* Garante visibilidade */
 }
 
-
-
-
-
 .task-footer {
     display: flex;
     justify-content: space-between;
@@ -87,4 +83,8 @@
 
 .task-actions .delete-task {
     color: #DC3545;
+}
+
+.task-actions .check-task {
+    color: green;
 }
