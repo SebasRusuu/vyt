@@ -20,7 +20,7 @@ function Header() {
     const [userName, setUserName] = useState<string | null>(null);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken');
         if (token) {
             try {
                 const decoded: DecodedToken = jwtDecode(token);
@@ -37,15 +37,15 @@ function Header() {
                             setUserName(decoded.user_name);
                         })
                         .catch((error) => {
-                            localStorage.removeItem('token');
+                            localStorage.removeItem('authToken');
                             console.error('Invalid token or user does not exist:', error);
                         });
                 } else {
-                    localStorage.removeItem('token'); // Remove expired token
+                    localStorage.removeItem('authToken'); // Remove expired token
                 }
             } catch (error) {
                 console.error('Invalid token:', error);
-                localStorage.removeItem('token'); // Remove invalid token
+                localStorage.removeItem('authToken'); // Remove invalid token
             }
         }
     }, []);
@@ -55,9 +55,10 @@ function Header() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
+        localStorage.removeItem('authToken');
         setUserName(null);
         navigate('/');
+        window.location.reload();
     };
 
     const handleCreateTaskClick = () => {
