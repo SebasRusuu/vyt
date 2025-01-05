@@ -20,10 +20,10 @@ public class UserRepositoryImpl implements UserRepository {
 
     public static final int LOG_ROUNDS = 10;
 
-    private static final String SQL_CREATE = "INSERT INTO userVyT(user_name, email, password_hash) VALUES(?, ?, ?)";
-    private static final String SQL_COUNT_BY_EMAIL = "SELECT COUNT(*) FROM userVyT WHERE email = ?";
-    private static final String SQL_FIND_BY_ID = "SELECT user_id, user_name, email, password_hash FROM userVyT WHERE user_id = ?";
-    private static final String SQL_FIND_BY_EMAIL = "SELECT user_id, user_name, email, password_hash FROM userVyT WHERE email = ?";
+    private static final String SQL_CREATE = "INSERT INTO uservyt(user_name, email, password_hash) VALUES(?, ?, ?)";
+    private static final String SQL_COUNT_BY_EMAIL = "SELECT COUNT(*) FROM uservyt WHERE email = ?";
+    private static final String SQL_FIND_BY_ID = "SELECT user_id, user_name, email, password_hash FROM uservyt WHERE user_id = ?";
+    private static final String SQL_FIND_BY_EMAIL = "SELECT user_id, user_name, email, password_hash FROM uservyt WHERE email = ?";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -65,8 +65,17 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Integer getCountByEmail(String email) {
-        return jdbcTemplate.queryForObject(SQL_COUNT_BY_EMAIL, new Object[]{email}, Integer.class);
+        try {
+            System.out.println("Executando SQL para verificar email: " + email); // Log para depuração
+            Integer count = jdbcTemplate.queryForObject(SQL_COUNT_BY_EMAIL, new Object[]{email}, Integer.class);
+            System.out.println("Resultado da contagem de emails: " + count); // Log para depuração
+            return count;
+        } catch (Exception e) {
+            System.err.println("Erro ao executar a consulta SQL: " + e.getMessage());
+            return 0; // Retorna 0 caso haja algum problema
+        }
     }
+
 
     @Override
     public Optional<User> findById(Integer userId) {

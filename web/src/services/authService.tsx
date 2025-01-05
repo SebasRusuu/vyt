@@ -8,12 +8,13 @@ interface RegisterData {
 
 export const registerUser = async (data: RegisterData): Promise<void> => {
     try {
-        await api.post('/user/register', data); // Registro sem token
-        console.log("Usuário registrado com sucesso");
+        await api.post('/user/register', data); // Faz o registro
+        console.log('Usuário registrado com sucesso');
     } catch (error: any) {
-        throw new Error(error.response?.data?.message || 'Erro durante o registro');
+        throw new Error(error.response?.data || 'Erro durante o registro');
     }
 };
+
 
 interface LoginData {
     email: string;

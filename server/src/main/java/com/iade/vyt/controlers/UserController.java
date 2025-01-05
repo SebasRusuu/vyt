@@ -1,6 +1,7 @@
     package com.iade.vyt.controlers;
 
     import com.iade.vyt.Constants;
+    import com.iade.vyt.exceptions.EtAuthException;
     import com.iade.vyt.models.User;
     import com.iade.vyt.services.UserService;
     import io.jsonwebtoken.Claims;
@@ -35,12 +36,21 @@
 
         @PostMapping("/register")
         public ResponseEntity<String> registerUser(@RequestBody Map<String, Object> userMap) {
-            String user_name = (String) userMap.get("user_name");
-            String email = (String) userMap.get("email");
-            String password_hash = (String) userMap.get("password_hash");
-            userService.registerUser(user_name, email, password_hash);
-            return new ResponseEntity<>("Usuário registrado com sucesso", HttpStatus.CREATED);
+            try {
+                String email = (String) userMap.get("email");
+                String user_name = (String) userMap.get("user_name");
+                String password_hash = (String) userMap.get("password_hash");
+
+                userService.registerUser(user_name, email, password_hash);
+                return new ResponseEntity<>("Usuário registrado com sucesso", HttpStatus.CREATED);
+            } catch (EtAuthException e) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            } catch (Exception e) {
+                return new ResponseEntity<>("Erro no registo: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
+
+
 
 
         private Map<String, String> generateJWTToken(User user) {
