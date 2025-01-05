@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ContainerTask from "../ContainerTask";
-import { fetchTasks } from "../../services/taskService";
+import { fetchIncompletedTasks } from "../../services/taskService";
 import "./MainLayout.css";
 import Filters from "../Filters";
 
@@ -39,12 +39,11 @@ const MainLayout: React.FC = () => {
                 setIsAuthenticated(true); // Utilizador autenticado
 
                 // Buscar tarefas do utilizador
-                const data = await fetchTasks();
+                const data = await fetchIncompletedTasks();
                 if (data.length === 0) {
                     setTasks([]); // Sem tarefas
                     setFilteredTasks([]);
                 } else {
-                    // Formatar tarefas recebidas
                     const formattedData = data.map((task: any) => ({
                         taskId: task.tarefaId,
                         title: task.tarefaTitulo,

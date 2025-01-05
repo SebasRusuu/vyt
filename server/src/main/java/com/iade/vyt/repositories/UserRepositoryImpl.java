@@ -66,13 +66,11 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Integer getCountByEmail(String email) {
         try {
-            System.out.println("Executando SQL para verificar email: " + email); // Log para depuração
             Integer count = jdbcTemplate.queryForObject(SQL_COUNT_BY_EMAIL, new Object[]{email}, Integer.class);
-            System.out.println("Resultado da contagem de emails: " + count); // Log para depuração
             return count;
         } catch (Exception e) {
             System.err.println("Erro ao executar a consulta SQL: " + e.getMessage());
-            return 0; // Retorna 0 caso haja algum problema
+            return 0;
         }
     }
 

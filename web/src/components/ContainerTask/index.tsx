@@ -1,7 +1,7 @@
 import React, { useState } from 'react'; // Adicionado: useState para controlar o pop-up
 import './ContainerTask.css';
-import { FaEdit, FaTrashAlt } from 'react-icons/fa';
-import { deleteTask } from "../../services/taskService";
+import { FaEdit, FaTrashAlt, FaCheck } from 'react-icons/fa';
+import {deleteTask, markTaskAsCompleted} from "../../services/taskService";
 import EditTask from '../EditTask'; // Adicionado: Importação do componente EditTask
 
 interface TaskProps {
@@ -59,10 +59,25 @@ const ContainerTask: React.FC<TaskProps> = ({ taskId, title, description, create
                 </p>
                 <div className="task-actions">
                     <button
+                        className="check-task"
+                        onClick={() => {
+                            markTaskAsCompleted(taskId)
+                                .then(() => {
+                                    console.log('Tarefa marcada como completada!');
+                                    window.location.reload(); // Atualiza a página
+                                })
+                                .catch((error) => {
+                                    console.log(error.message);
+                                });
+                        }}
+                    >
+                        <FaCheck/>
+                    </button>
+                    <button
                         className="edit-task"
                         onClick={() => setIsEditPopupOpen(true)} // Adicionado: Abre o pop-up de edição
                     >
-                        <FaEdit />
+                        <FaEdit/>
                     </button>
                     <button
                         className="delete-task"

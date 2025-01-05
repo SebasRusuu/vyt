@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ResetEmail from './components/ResetEmail';
 import ResetPassword from './components/ResetPassword';
+import Completed from './pages/Completed';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 
@@ -30,6 +31,7 @@ function AppContent() {
         <Route path="/register" element={<Register />} />
         <Route path="/reset-email" element={<ResetEmail />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/completed" element={<Completed />} />
       </Routes>
       
     </div>
