@@ -64,36 +64,43 @@ export const deleteTask = async (taskId: number) => {
     }
 }
 
-// Função para buscar uma tarefa pelo ID
-export const getTaskById = async (taskId: number) => {
-    const response = await fetch(`/api/tarefa/${taskId}`, {
-        method: "GET", // Método HTTP para obter dados
-        headers: {
-            "Content-Type": "application/json", // Define o tipo de conteúdo como JSON
-        },
-    });
 
-    if (!response.ok) {
-        throw new Error("Erro ao buscar a tarefa."); // Lança erro se a resposta não for bem-sucedida
+export const getTaskById = async (taskId: number): Promise<any> => {
+    try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            throw new Error('Token JWT não encontrado!');
+        }
+
+        const response = await api.get(`/tarefa/id/${taskId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        return response.data; // Retorna os dados da tarefa
+    } catch (error: any) {
+        throw new Error(
+            error.response?.data?.message || 'Erro ao buscar a tarefa'
+        );
     }
-
-    return await response.json(); // Retorna os dados da tarefa
 };
 
-// Função para editar uma tarefa existente
-export const editTask = async (taskId: number, updatedTask: any) => {
-    const response = await fetch(`/api/tarefa/update/${taskId}`, {
-        method: "PUT", // Método HTTP para atualização
-        headers: {
-            "Content-Type": "application/json", // Define o tipo de conteúdo como JSON
-        },
-        body: JSON.stringify(updatedTask), // Envia os dados atualizados
-    });
+export const updateTask = async (taskId: number, updatedTask: any): Promise<any> => {
+    try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            throw new Error('Token JWT não encontrado!');
+        }
 
-    if (!response.ok) {
-        throw new Error("Erro ao editar a tarefa."); // Lança erro se a resposta não for bem-sucedida
+        const response = await api.put('/tarefa/update', updatedTask, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        return response.data; // Retorna a tarefa atualizada
+    } catch (error: any) {
+        throw new Error(
+            error.response?.data?.message || 'Erro ao atualizar a tarefa'
+        );
     }
-
-    return await response.json(); // Retorna os dados atualizados da tarefa
 };
+
 

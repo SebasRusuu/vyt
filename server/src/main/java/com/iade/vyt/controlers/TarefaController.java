@@ -23,9 +23,9 @@ public class    TarefaController {
 
     @GetMapping("/{userId}")
     public List<Tarefa> getTarefasByUser(@PathVariable int userId) {
-        List<Tarefa> tarefas = tarefaService.getTarefasByUserId(userId);
-        return tarefas;
+        return tarefaService.getTarefasByUserId(userId);
     }
+
 
 
     @PostMapping("/create")
@@ -49,6 +49,16 @@ public class    TarefaController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<Tarefa> updateTarefa(@RequestBody Tarefa tarefa) {
+        Tarefa updatedTarefa = tarefaService.updateTarefa(tarefa);
+        return new ResponseEntity<>(updatedTarefa, HttpStatus.OK);
+    }
+
+    @GetMapping("/id/{tarefaId}")
+    public Tarefa getTarefaById(@PathVariable int tarefaId) {
+        return tarefaService.getTarefaById(tarefaId);
+    }
 
 }
 
