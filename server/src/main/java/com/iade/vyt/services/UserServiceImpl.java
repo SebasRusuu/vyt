@@ -33,21 +33,22 @@ public class UserServiceImpl implements UserService {
             Pattern pattern = Pattern.compile("^(.+)@(.+)$");
             if (email != null) email = email.toLowerCase();
             if (!pattern.matcher(email).matches())
-                throw new EtAuthException("Invalid email format");
+                throw new EtAuthException("Formato de email inválido");
 
             Integer count = userRepository.getCountByEmail(email);
             if (count != null && count > 0)
-                throw new EtAuthException("Email already in use");
+                throw new EtAuthException("Email já está em uso");
 
             Integer userId = userRepository.create(user_name, email, password_hash);
 
-            // Lidar corretamente com o retorno do findById:
             return userRepository.findById(userId)
-                    .orElseThrow(() -> new EtAuthException("User not found after creation"));
+                    .orElseThrow(() -> new EtAuthException("Utilizador não encontrado após criação"));
         } catch (DataAccessException e) {
-            throw new EtAuthException("Database connection error", e);
+            System.err.println("Erro ao conectar à base de dados: " + e.getMessage());
+            throw new EtAuthException("Erro de conexão com a base de dados", e);
         }
     }
+
 
     @Override
     public User findById(Integer userId) {
@@ -55,6 +56,8 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
     }
+
+
 
 
 }

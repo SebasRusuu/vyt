@@ -52,9 +52,11 @@ const Register: React.FC = () => {
       setSuccess('User registered successfully!');
       navigate('/login'); // Redireciona para a página de login
     } catch (err: any) {
-      setError(err.message); // Exibe o erro no frontend
+      console.error('Erro no registro:', err.message);
+      setError(err.message); // Define a mensagem específica de erro
     }
   };
+
 
 
   return (
