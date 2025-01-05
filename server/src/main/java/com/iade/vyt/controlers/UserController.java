@@ -5,6 +5,7 @@
     import com.iade.vyt.services.UserService;
     import io.jsonwebtoken.Claims;
     import io.jsonwebtoken.Jwts;
+    import io.jsonwebtoken.SignatureAlgorithm;
     import jakarta.servlet.http.HttpServletRequest;
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@
         private Map<String, String> generateJWTToken(User user) {
             long timestamp = System.currentTimeMillis();
             String token = Jwts.builder()
-                    .signWith(constants.getApiSecretKey())
+                    .signWith(constants.getApiSecretKey(), SignatureAlgorithm.HS256) // Certifique-se de que o algoritmo está correto
                     .setIssuedAt(new Date(timestamp))
                     .setExpiration(new Date(timestamp + constants.getTokenValidity()))
                     .claim("user_id", user.getUserId())

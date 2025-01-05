@@ -9,12 +9,14 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('authToken');
+    console.log("Token enviado no header:", localStorage.getItem("authToken"));
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
 }, (error) => {
     return Promise.reject(error);
+
 });
 
 api.interceptors.response.use((response) => response, (error) => {
@@ -23,5 +25,7 @@ api.interceptors.response.use((response) => response, (error) => {
     }
     return Promise.reject(error);
 });
+
+
 
 export default api;
