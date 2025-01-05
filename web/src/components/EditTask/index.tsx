@@ -88,11 +88,15 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
     return (
         <div className="edit-task-overlay">
             <div className="edit-task-popup">
-                <button className="edit-task-close-btn" onClick={onClose}>
-                    &times;
-                </button>
+                <button
+                    type="button"
+                    className="btn-close"
+                    aria-label="Close"
+                    onClick={onClose}
+                    style={{ float: "right" }}
+                ></button>
                 <form onSubmit={handleSubmit}>
-                    <h2>Editar Tarefa</h2>
+                    <h2>Tarefa</h2>
                     {error && <p className="edit-task-error">{error}</p>}
                     <div className="edit-task-field">
                         <label htmlFor="tarefaTitulo">Título</label>

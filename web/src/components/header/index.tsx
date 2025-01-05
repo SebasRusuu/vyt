@@ -125,7 +125,11 @@ function Header() {
                                             borderRadius: '20px',
                                             padding: '3px 15px',
                                             color: '#FFFFFF',
-                                        }}>
+                                            cursor: 'pointer',
+                                            transition: 'background-color 0.3s ease-in-out',
+                                        }}
+                                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#3a8f8e')}
+                                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#3aafae')}>
                                         Create a New Task
                                     </span>
                                 </li>
