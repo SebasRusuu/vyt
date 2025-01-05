@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./EditTask.css"; // Estilos específicos do componente
-import { getTaskById, editTask } from "../../services/taskService"; // Serviços para buscar e editar tarefas
+import { getTaskById, updateTask } from "../../services/taskService";
 
 interface EditTaskProps {
     taskId: number; // ID da tarefa a ser editada
@@ -13,27 +13,28 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
         tarefaDescricao: "",
         tarefaImportancia: "Pouco Importante",
         tarefaPrioridade: "Não Urgente",
-        tarefaPreferenciaTempo: "00:30:00",
+        tarefaPreferenciaTempo: "",
     });
     const [error, setError] = useState<string | null>(null);
 
-    // Carrega os dados da tarefa ao abrir o pop-up
     useEffect(() => {
         const fetchTask = async () => {
             try {
-                const data = await getTaskById(taskId); // Busca os dados da tarefa pelo ID
+                const taskData = await getTaskById(taskId);
                 setFormData({
-                    tarefaTitulo: data.tarefaTitulo || "",
-                    tarefaDescricao: data.tarefaDescricao || "",
-                    tarefaImportancia: data.tarefaImportanciaPrioridade.includes("Importante")
-                        ? "Importante"
-                        : "Pouco Importante",
-                    tarefaPrioridade: data.tarefaImportanciaPrioridade.includes("Urgente")
-                        ? "Urgente"
-                        : "Não Urgente",
-                    tarefaPreferenciaTempo: data.tarefaPreferenciaTempo || "00:30:00",
+                    tarefaTitulo: taskData.tarefaTitulo,
+                    tarefaDescricao: taskData.tarefaDescricao,
+                    tarefaImportancia:
+                        taskData.tarefaImportanciaPrioridade === "Alto" || taskData.tarefaImportanciaPrioridade === "Médio"
+                            ? "Importante"
+                            : "Pouco Importante",
+                    tarefaPrioridade:
+                        taskData.tarefaImportanciaPrioridade === "Alto" || taskData.tarefaImportanciaPrioridade === "Urgente"
+                            ? "Urgente"
+                            : "Não Urgente",
+                    tarefaPreferenciaTempo: taskData.tarefaPreferenciaTempo || "00:30:00",
                 });
-            } catch (error) {
+            } catch (err) {
                 setError("Erro ao carregar a tarefa.");
             }
         };
@@ -68,14 +69,17 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
                 importanciaPrioridade = "Médio";
             }
 
-            await editTask(taskId, {
+            const updatedTask = {
+                tarefaId: taskId,
                 tarefaTitulo: formData.tarefaTitulo,
                 tarefaDescricao: formData.tarefaDescricao,
                 tarefaImportanciaPrioridade: importanciaPrioridade,
                 tarefaPreferenciaTempo: formData.tarefaPreferenciaTempo,
-            });
+            };
 
+            await updateTask(taskId, updatedTask);
             onClose(); // Fecha o pop-up
+            window.location.reload(); // Atualiza a lista de tarefas
         } catch (err: any) {
             setError("Erro ao atualizar a tarefa.");
         }
@@ -158,5 +162,4 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
         </div>
     );
 };
-
 export default EditTask;
