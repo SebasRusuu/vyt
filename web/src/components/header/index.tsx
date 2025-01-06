@@ -1,77 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode'; // Corrected import
-import axiosInstance from '../../services/api';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from '../../assets/MiniVerde.png';
-
 import './header.css';
 import NewTask from '../NewTask';
-
-interface DecodedToken {
-    user_name: string;
-    exp: number;
-}
+import { AuthContext } from '../../context/AuthContext';
 
 function Header() {
+    const { user, logout } = useContext(AuthContext); // Usando o AuthContext
     const navigate = useNavigate();
-    const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-    const [userName, setUserName] = useState<string | null>(null);
-
-    useEffect(() => {
-        const token = localStorage.getItem('authToken');
-        if (token) {
-            try {
-                const decoded: DecodedToken = jwtDecode(token);
-                const currentTime = Date.now() / 1000; // Current time in seconds
-                if (decoded.exp > currentTime) {
-                    // Make an API call to validate the token with the backend
-                    axiosInstance
-                        .get('/user/validate-token', {
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                            },
-                        })
-                        .then((response) => {
-                            setUserName(decoded.user_name);
-                        })
-                        .catch((error) => {
-                            localStorage.removeItem('authToken');
-                            console.error('Invalid token or user does not exist:', error);
-                        });
-                } else {
-                    localStorage.removeItem('authToken'); // Remove expired token
-                }
-            } catch (error) {
-                console.error('Invalid token:', error);
-                localStorage.removeItem('authToken'); // Remove invalid token
-            }
-        }
-    }, []);
-
-    const handleLoginClick = () => {
-        navigate('/login');
-    };
-
-    const handleLogout = () => {
-        localStorage.removeItem('authToken');
-        setUserName(null);
-        navigate('/');
-        window.location.reload();
-    };
 
     const handleCreateTaskClick = () => {
-        if (!userName) {
+        if (!user) {
             navigate('/login');
+        } else {
+            console.log('Abrindo modal para criar nova tarefa');
         }
-        else {
-        setIsTaskModalOpen(true);
-        }
-    };
-
-    const handleCloseTaskModal = () => {
-        setIsTaskModalOpen(false); // Close the pop-up
     };
 
     return (
@@ -109,14 +54,20 @@ function Header() {
                         <div className="offcanvas-body container">
                             <ul className="navbar-nav justify-content-end flex-grow-1 pe-3 gap-3">
                                 <li className="nav-item">
-                                    {userName ? (
+                                    {user ? (
                                         <>
-                                            <span className="nav-link">Welcome, {userName}</span>
-                                            <span className="nav-link" onClick={handleLogout}>Logout</span>
+                                            <span className="nav-link">Olá, {user}</span>
+                                            <span className="nav-link" onClick={logout}>
+                                                Logout
+                                            </span>
                                         </>
-                                    ):(<span className="nav-link" onClick={handleLoginClick}>Login</span>)}
+                                    ) : (
+                                        <Link to="/login" className="nav-link">
+                                            Login
+                                        </Link>
+                                    )}
                                 </li>
-                                <li className="nav-item" style={{paddingTop:'5px'}}>
+                                <li className="nav-item" style={{ paddingTop: '5px' }}>
                                     <span
                                         className="nav-link"
                                         onClick={handleCreateTaskClick}
@@ -125,12 +76,9 @@ function Header() {
                                             borderRadius: '20px',
                                             padding: '3px 15px',
                                             color: '#FFFFFF',
-                                            cursor: 'pointer',
-                                            transition: 'background-color 0.3s ease-in-out',
                                         }}
-                                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#3a8f8e')}
-                                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#3aafae')}>
-                                        Create a New Task
+                                    >
+                                        Criar Nova Tarefa
                                     </span>
                                 </li>
                             </ul>
@@ -138,9 +86,7 @@ function Header() {
                     </div>
                 </div>
             </header>
-
-            {/* Include the NewTask component as a pop-up */}
-            <NewTask isOpen={isTaskModalOpen} onClose={handleCloseTaskModal} />
+            <NewTask isOpen={false} onClose={() => {}} />
         </>
     );
 }

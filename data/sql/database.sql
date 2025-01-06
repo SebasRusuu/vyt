@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS uservyt(
     user_id SERIAL PRIMARY KEY not null,
     user_name VARCHAR(30) not null,
     email VARCHAR(50) UNIQUE not null,
-    password_hash VARCHAR(100) not null
+    password VARCHAR(100),
+    provider VARCHAR(50) DEFAULT 'local'
     );
 
 CREATE TABLE IF NOT EXISTS tokens(
