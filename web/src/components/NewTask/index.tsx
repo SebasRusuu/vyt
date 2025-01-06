@@ -69,6 +69,7 @@ const NewTask: React.FC<NewTaskProps> = ({ isOpen, onClose }) => {
                     className="btn-close"
                     aria-label="Close"
                     onClick={onClose}
+                    style={{ float: "right" }}
                 ></button>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">

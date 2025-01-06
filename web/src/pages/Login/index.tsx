@@ -1,130 +1,137 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  MDBBtn,
-  MDBContainer,
-  MDBRow,
-  MDBCol,
-  MDBInput
-} from 'mdb-react-ui-kit';
+import { MDBBtn, MDBContainer, MDBRow, MDBCol, MDBInput } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
-import { loginUser } from '../../services/authService';
 import teste from '../../assets/teste6.png';
 import './login.css';
+import axios from 'axios';
+import { AuthContext } from '../../context/AuthContext';
 
 const Login: React.FC = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: '', password_hash: '' });
-  const [error, setError] = useState<string | null>(null);
+    const { login } = useContext(AuthContext); // Usando o AuthContext
+    const navigate = useNavigate();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [message, setMessage] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const handleLogin = async (event: React.FormEvent) => {
+        event.preventDefault();
+        try {
+            const response = await axios.post('http://localhost:8080/api/auth/login', {
+                email,
+                password,
+            });
+            login(response.data.token); // Atualiza o estado global de autenticação
+            navigate('/'); // Redireciona para a página inicial
+        } catch (error: any) {
+            console.error('Login error:', error);
+            if (error.response && error.response.status === 401) {
+                setMessage('Credenciais inválidas');
+            } else {
+                setMessage('Erro ao tentar login');
+            }
+        }
+    };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+    const handleGoogleLogin = () => {
+        window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    };
 
-    try {
-      const response = await loginUser(formData);
-      localStorage.setItem('token', response.token); // Armazena o token no LocalStorage
-      navigate('/'); // Redireciona para a página inicial
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
+    const handleRegisterClick = () => navigate('/register');
+    const handleForgotPasswordClick = () => navigate('/reset-email');
 
-  const handleRegisterClick = () => navigate('/register');
-  const handleForgotPasswordClick = () => navigate('/reset-email');
-
-  return (
-      <MDBContainer fluid>
-        <MDBRow>
-          <MDBCol sm="6">
-            <button
-                type="button"
-                className="btn-close"
-                aria-label="Close"
-                onClick={() => navigate('/')}
-                style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                  left: '10px',
-                }}
-            ></button>
-            <div className="d-flex flex-column justify-content-center h-custom-2 w-75 pt-4">
-              <h3
-                  className="fw-normal mb-3 ps-5 pb-3"
-                  style={{ letterSpacing: '1px' }}
-              >
-                Log in
-              </h3>
-              <form onSubmit={handleSubmit}>
-                <MDBInput
-                    wrapperClass="mb-4 mx-5 w-100"
-                    label="Email address"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    type="email"
-                    size="lg"
-                />
-                <MDBInput
-                    wrapperClass="mb-4 mx-5 w-100"
-                    label="Password"
-                    name="password_hash"
-                    value={formData.password_hash}
-                    onChange={handleChange}
-                    type="password"
-                    size="lg"
-                />
-                <MDBBtn
-                    className="mb-4 px-5 mx-5 w-100"
-                    size="lg"
-                    style={{ backgroundColor: '#61CEE1', color: '#FFFFFF' }}
-                    type="submit"
-                >
-                  Login
-                </MDBBtn>
-              </form>
-              {error && <p style={{ color: 'red', marginLeft: '20px' }}>{error}</p>}
-              <p className="small mb-5 pb-lg-3 ms-5">
-              <span onClick={handleForgotPasswordClick} style={{ cursor: 'pointer' }}>
-                Forgot password?
-              </span>
-              </p>
-              <p className="ms-5">
-                Don't have an account?{' '}
-                <span
-                    onClick={handleRegisterClick}
-                    style={{
-                      cursor: 'pointer',
-                      color: '#61CEE1',
-                      textDecoration: 'underline',
-                    }}
-                    className="link-info"
-                >
-                Register here
-              </span>
-              </p>
-            </div>
-          </MDBCol>
-          <MDBCol sm="6" className="d-none d-sm-block px-0">
-            <img
-                src={teste}
-                alt="Register image"
-                className="w-100"
-                style={{
-                  objectFit: 'cover',
-                  objectPosition: 'left',
-                  backgroundColor: '#ADD8E6',
-                }}
-            />
-          </MDBCol>
-        </MDBRow>
-      </MDBContainer>
-  );
+    return (
+        <MDBContainer fluid>
+            <MDBRow>
+                <MDBCol sm="6">
+                    <button
+                        type="button"
+                        className="btn-close"
+                        aria-label="Close"
+                        onClick={() => navigate('/')}
+                        style={{
+                            position: 'absolute',
+                            top: '10px',
+                            right: '10px',
+                            left: '10px',
+                        }}
+                    ></button>
+                    <div className="d-flex flex-column justify-content-center h-custom-2 w-75 pt-4">
+                        <h3 className="fw-normal mb-3 ps-5 pb-3" style={{ letterSpacing: '1px' }}>
+                            Log in
+                        </h3>
+                        <form onSubmit={(e) => handleLogin(e)}>
+                            <MDBInput
+                                wrapperClass="mb-4 mx-5 w-100"
+                                label="Email address"
+                                name="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                type="email"
+                                size="lg"
+                            />
+                            <MDBInput
+                                wrapperClass="mb-4 mx-5 w-100"
+                                label="Password"
+                                name="password_hash"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                type="password"
+                                size="lg"
+                            />
+                            <MDBBtn
+                                className="mb-4 px-5 mx-5 w-100"
+                                size="lg"
+                                style={{ backgroundColor: '#61CEE1', color: '#FFFFFF' }}
+                                type="submit"
+                            >
+                                Login
+                            </MDBBtn>
+                            <MDBBtn
+                                className="mb-4 px-5 mx-5 w-100"
+                                size="lg"
+                                style={{ backgroundColor: '#61CEE1', color: '#FFFFFF' }}
+                                onClick={handleGoogleLogin}
+                            >
+                                Login com Google
+                            </MDBBtn>
+                        </form>
+                        <p className="small mb-5 pb-lg-3 ms-5">
+                            <span onClick={handleForgotPasswordClick} style={{ cursor: 'pointer' }}>
+                                Forgot password?
+                            </span>
+                        </p>
+                        <p className="ms-5">
+                            Don't have an account?{' '}
+                            <span
+                                onClick={handleRegisterClick}
+                                style={{
+                                    cursor: 'pointer',
+                                    color: '#61CEE1',
+                                    textDecoration: 'underline',
+                                }}
+                                className="link-info"
+                            >
+                                Register here
+                            </span>
+                        </p>
+                    </div>
+                </MDBCol>
+                <MDBCol sm="6" className="d-none d-sm-block px-0">
+                    <img
+                        src={teste}
+                        alt="Register image"
+                        className="w-100"
+                        style={{
+                            objectFit: 'cover',
+                            objectPosition: 'left',
+                            backgroundColor: '#ADD8E6',
+                        }}
+                    />
+                </MDBCol>
+            </MDBRow>
+        </MDBContainer>
+    );
 };
 
 export default Login;

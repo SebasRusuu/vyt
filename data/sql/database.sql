@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS uservyt(
     user_id SERIAL PRIMARY KEY not null,
     user_name VARCHAR(30) not null,
     email VARCHAR(50) UNIQUE not null,
-    password_hash VARCHAR(100) not null
+    password VARCHAR(100),
+    provider VARCHAR(50) DEFAULT 'local'
     );
 
 CREATE TABLE IF NOT EXISTS tokens(
@@ -21,6 +22,7 @@ CREATE TABLE if not exists tarefas(
     tarefa_importancia_prioridade VARCHAR(20),
     tarefa_preferencia_tempo time,
     tarefa_criacao_at timestamp,
+    tarefa_completada boolean,
     FOREIGN KEY (tarefa_user_id) REFERENCES uservyt(user_id)
 
     );

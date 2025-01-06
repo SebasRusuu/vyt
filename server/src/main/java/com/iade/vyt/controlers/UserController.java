@@ -1,103 +1,111 @@
-    package com.iade.vyt.controlers;
+package com.iade.vyt.controlers;
 
-    import com.iade.vyt.Constants;
-    import com.iade.vyt.exceptions.EtAuthException;
-    import com.iade.vyt.models.User;
-    import com.iade.vyt.services.UserService;
-    import io.jsonwebtoken.Claims;
-    import io.jsonwebtoken.Jwts;
-    import jakarta.servlet.http.HttpServletRequest;
-    import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.http.HttpStatus;
-    import org.springframework.http.ResponseEntity;
-    import org.springframework.web.bind.annotation.*;
-
-    import java.util.Date;
-    import java.util.HashMap;
-    import java.util.Map;
-
-    @RestController
-    @RequestMapping("/api/user")
-    public class UserController {
-
-        @Autowired
-        private UserService userService;
-
-        @Autowired
-        private Constants constants;
-
-        @PostMapping("/login")
-        public ResponseEntity<Map<String, String>> loginUser(@RequestBody Map<String, Object> userMap) {
-            String email = (String) userMap.get("email");
-            String password = (String) userMap.get("password_hash");
-            User user = userService.validateUser(email, password);
-            return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
-        }
-
-        @PostMapping("/register")
-        public ResponseEntity<String> registerUser(@RequestBody Map<String, Object> userMap) {
-            try {
-                String email = (String) userMap.get("email");
-                String user_name = (String) userMap.get("user_name");
-                String password_hash = (String) userMap.get("password_hash");
-
-                userService.registerUser(user_name, email, password_hash);
-                return new ResponseEntity<>("Usuário registrado com sucesso", HttpStatus.CREATED);
-            } catch (EtAuthException e) {
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-            } catch (Exception e) {
-                return new ResponseEntity<>("Erro no registo: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+import com.iade.vyt.exceptions.InvalidCredentialsException;
+import com.iade.vyt.models.AuthResponse;
+import com.iade.vyt.models.LoginRequest;
+import com.iade.vyt.models.User;
+import com.iade.vyt.repositories.UserRepository;
+import com.iade.vyt.services.JwtTokenProvider;
+import com.iade.vyt.services.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletResponse;
 
 
+import java.io.IOException;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/auth")
+public class UserController {
+
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
+    private final UserRepository userRepository;
 
 
-        private Map<String, String> generateJWTToken(User user) {
-            long timestamp = System.currentTimeMillis();
-            String token = Jwts.builder()
-                    .signWith(constants.getApiSecretKey())
-                    .setIssuedAt(new Date(timestamp))
-                    .setExpiration(new Date(timestamp + constants.getTokenValidity()))
-                    .claim("user_id", user.getUserId())
-                    .claim("email", user.getEmail())
-                    .claim("user_name", user.getUserName())
-                    .compact();
-            Map<String, String> map = new HashMap<>();
-            map.put("token", token);
-            return map;
-        }
+    public UserController(JwtTokenProvider jwtTokenProvider, UserService userService, UserRepository userRepository) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.userService = userService;
+        this.userRepository = userRepository;
+    }
 
-        @GetMapping("/validate-token")
-        public ResponseEntity<?> validateToken(HttpServletRequest request) {
-            String authHeader = request.getHeader("Authorization");
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                String token = authHeader.substring(7);
-                try {
-                    Claims claims = Jwts.parserBuilder()
-                            .setSigningKey(constants.getApiSecretKey())
-                            .build()
-                            .parseClaimsJws(token)
-                            .getBody();
-
-                    Integer userId = claims.get("user_id", Integer.class);
-                    User user = userService.findById(userId);
-                    if (user != null) {
-                        return new ResponseEntity<>(HttpStatus.OK);
-                    } else {
-                        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-                    }
-                } catch (Exception e) {
-                    return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-                }
-            } else {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
-        }
-
-
-        @GetMapping("/test")
-        public String test() {
-            return "Controller is working!";
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            User user = userService.validateUser(loginRequest.getEmail(), loginRequest.getPassword());
+            String token = jwtTokenProvider.generateToken(user.getEmail(), user.getUserName()); // Passa o nome do usuário
+            return ResponseEntity.ok(new AuthResponse(token));
+        } catch (InvalidCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
+
+
+
+
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@RequestBody Map<String, String> userMap) {
+        try {
+            // Verifique se os campos estão sendo enviados
+            String userName = userMap.get("userName");
+            String email = userMap.get("email");
+            String password = userMap.get("password");
+
+            if (userName == null || email == null || password == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Todos os campos (userName, email, password) são obrigatórios.");
+            }
+
+            userService.registerUser(userName, email, password);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Usuário registrado com sucesso");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro no registro: " + e.getMessage());
+        }
+    }
+
+
+
+    @GetMapping("/oauth2-success")
+    public ResponseEntity<Void> oauth2Success(Authentication authentication, HttpServletResponse response) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String email = authentication.getName();
+        String name = null;
+
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
+            Map<String, Object> attributes = oauthToken.getPrincipal().getAttributes();
+            email = (String) attributes.get("email");
+            name = (String) attributes.get("name");
+        }
+
+        // Verifique ou registre o usuário
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            user = new User();
+            user.setEmail(email);
+            user.setUserName(name != null ? name : email);
+            user.setPassword(null); // Login Google não precisa de senha
+            user.setProvider("google");
+            userRepository.save(user);
+        }
+
+        // Gere o token JWT com o nome do usuário
+        String token = jwtTokenProvider.generateToken(user.getEmail(), user.getUserName());
+
+        try {
+            response.sendRedirect("http://localhost:3000/?token=" + token);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+
+}

@@ -23,6 +23,9 @@ public class User {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "password_hash")
-    private String passwordHash;
+    @Column(name = "password")
+    private String password;
+
+    @Column(name = "provider")
+    private String provider;
 }
