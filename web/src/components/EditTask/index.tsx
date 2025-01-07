@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , useContext} from "react";
 import "./EditTask.css"; // Estilos específicos do componente
+import api from "../../services/api";
+import { AuthContext } from "../../context/AuthContext";
 
 
 interface EditTaskProps {
@@ -11,11 +13,12 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
     const [formData, setFormData] = useState({
         tarefaTitulo: "",
         tarefaDescricao: "",
-        tarefaImportancia: "Pouco Importante",
-        tarefaPrioridade: "Não Urgente",
+        tarefaImportancia: "",
+        tarefaPrioridade: "",
         tarefaPreferenciaTempo: "",
     });
     const [error, setError] = useState<string | null>(null);
+    const { token } = useContext(AuthContext);
 
 
     const handleChange = (
@@ -26,6 +29,73 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
             [e.target.name]: e.target.value,
         });
     };
+
+    useEffect(() => {
+        const loadTask = async () => {
+            try {
+                const response = await api.get(`/api/tarefa/id/${taskId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                const task = response.data;
+                setFormData({
+                    tarefaTitulo: task.tarefaTitulo,
+                    tarefaDescricao: task.tarefaDescricao,
+                    tarefaImportancia: task.tarefaImportancia,
+                    tarefaPrioridade: task.tarefaPrioridade,
+                    tarefaPreferenciaTempo: task.tarefaPreferenciaTempo,
+                });
+            } catch (err: any) {
+                console.error("Erro ao carregar tarefa:", err.message);
+                setError("Erro ao carregar tarefa. Tente novamente.");
+            }
+        };
+
+        loadTask();
+    }, [taskId]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+
+        try {
+            // Determinar a combinação de Importância & Prioridade
+            let importanciaPrioridade = "Baixo";
+            if (
+                formData.tarefaImportancia === "Importante" &&
+                formData.tarefaPrioridade === "Urgente"
+            ) {
+                importanciaPrioridade = "Alto";
+            } else if (
+                formData.tarefaImportancia === "Importante" ||
+                formData.tarefaPrioridade === "Urgente"
+            ) {
+                importanciaPrioridade = "Médio";
+            }
+
+            // Realizar o pedido PUT para atualizar a tarefa
+            await api.put(
+                `/api/tarefa/update/${taskId}`,
+                {
+                    tarefaTitulo: formData.tarefaTitulo,
+                    tarefaDescricao: formData.tarefaDescricao,
+                    tarefaImportanciaPrioridade: importanciaPrioridade,
+                    tarefaPreferenciaTempo: formData.tarefaPreferenciaTempo,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            onClose(); // Fecha o pop-up após a atualização
+            window.location.reload(); // Recarrega a página para atualizar a lista de tarefas
+        } catch (err: any) {
+            console.error("Erro ao atualizar a tarefa:", err.message);
+            setError("Erro ao atualizar a tarefa. Tente novamente.");
+        }
+    }
 
 
 
@@ -39,7 +109,8 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
                     onClick={onClose}
                     style={{ float: "right" }}
                 ></button>
-                <form>
+                <form onSubmit={handleSubmit}>
+
                     <h2>Tarefa</h2>
                     {error && <p className="edit-task-error">{error}</p>}
                     <div className="edit-task-field">
@@ -104,6 +175,7 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
                     </div>
                     <button type="submit" className="edit-task-submit-btn">
                         Salvar Alterações
+                        
                     </button>
                 </form>
             </div>
