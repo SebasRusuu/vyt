@@ -60,4 +60,19 @@ public class TarefaService {
         return tarefaRepository.save(tarefa);
     }
 
+    public Tarefa updateTarefa(int tarefaId, Tarefa tarefa) {
+        Tarefa tarefaToUpdate = tarefaRepository.findById(tarefaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada."));
+        tarefaToUpdate.setTarefaTitulo(tarefa.getTarefaTitulo());
+        tarefaToUpdate.setTarefaDescricao(tarefa.getTarefaDescricao());
+        tarefaToUpdate.setTarefaImportanciaPrioridade(tarefa.getTarefaImportanciaPrioridade());
+        tarefaToUpdate.setTarefaPreferenciaTempo(tarefa.getTarefaPreferenciaTempo());
+        return tarefaRepository.save(tarefaToUpdate);
+    }
+
+    public Tarefa getTarefaById(int tarefaId) {
+        return tarefaRepository.findById(tarefaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada."));
+    }
+
 }

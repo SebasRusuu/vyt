@@ -85,8 +85,6 @@ public class    TarefaController {
     @DeleteMapping("/delete/{tarefaId}")
     public ResponseEntity<Void> deleteTarefa(@PathVariable int tarefaId, HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("user_id");
-        System.out.println("User ID recebido no request: " + userId);
-        System.out.println("Tarefa ID recebido para exclusão: " + tarefaId);
 
         if (userId == null) {
             System.out.println("Erro: User ID não encontrado. Token inválido ou usuário não autenticado.");
@@ -97,4 +95,33 @@ public class    TarefaController {
         System.out.println("Tarefa excluída com sucesso.");
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+
+    @PutMapping("/update/{tarefaId}")
+    public ResponseEntity<Void> updateTarefa(@PathVariable int tarefaId, @RequestBody Tarefa tarefa, HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("user_id");
+
+        if (userId == null) {
+            System.out.println("Erro: User ID não encontrado. Token inválido ou usuário não autenticado.");
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        tarefaService.updateTarefa(tarefaId, tarefa);
+        System.out.println("Tarefa atualizada com sucesso.");
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/id/{tarefaId}")
+    public ResponseEntity<?> getTarefaById(@PathVariable int tarefaId, HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("user_id");
+
+        if (userId == null) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        Tarefa tarefa = tarefaService.getTarefaById(tarefaId);
+        return ResponseEntity.ok(tarefa);
+    }
+    
 }
+
