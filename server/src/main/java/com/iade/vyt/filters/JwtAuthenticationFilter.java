@@ -29,29 +29,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        String path = request.getRequestURI();
+
+        // Ignorar endpoints do OAuth2
+        if (path.startsWith("/oauth2/") || path.equals("/login")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = getTokenFromRequest(request);
+        System.out.println("Token recebido no filtro: " + token);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            String email = jwtTokenProvider.getUsernameFromToken(token); // O email é extraído do token
+            String email = jwtTokenProvider.getUsernameFromToken(token);
             System.out.println("Token válido. Email extraído: " + email);
 
             User user = userRepository.findByEmail(email).orElse(null);
             if (user != null) {
                 System.out.println("Usuário encontrado. ID: " + user.getUserId());
-                request.setAttribute("user_id", user.getUserId()); // Configura o user_id no request
+                request.setAttribute("user_id", user.getUserId()); // Adicionar user_id ao request
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication); // Associar ao SecurityContext
             } else {
                 System.out.println("Usuário não encontrado no banco de dados.");
             }
         } else {
-            System.out.println("Nenhum token encontrado ou token inválido.");
+            System.out.println("Token inválido ou não encontrado.");
         }
 
         filterChain.doFilter(request, response);
     }
+
 
 
     private String getTokenFromRequest(HttpServletRequest request) {

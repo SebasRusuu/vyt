@@ -9,6 +9,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.iade.vyt.models.Tarefa;
 import com.iade.vyt.repositories.TarefaRepository;
 
+import java.util.List;
+
 
 @Service
 public class TarefaService {
@@ -25,6 +27,32 @@ public class TarefaService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilizador não encontrado."));
         tarefa.setTarefaUser(user); // Associa o utilizador à tarefa
+    }
+
+    public List<Tarefa> getIncompleteTarefasByUserId(int userId) {
+        return tarefaRepository.findByTarefaUserUserIdAndTarefaCompletada(userId, false);
+    }
+
+    public List<Tarefa> getCompleteTarefasByUserId(int userId) {
+        return tarefaRepository.findByTarefaUserUserIdAndTarefaCompletada(userId, true);
+    }
+
+    public void markAsCompleted(int tarefaId) {
+        System.out.println("Buscando tarefa com ID: " + tarefaId);
+        Tarefa tarefa = tarefaRepository.findById(tarefaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada."));
+        tarefa.setTarefaCompletada(true);
+        tarefaRepository.save(tarefa);
+        System.out.println("Tarefa marcada como completada no banco de dados: " + tarefaId);
+    }
+
+
+    public void deleteTarefa(int tarefaId) {
+        System.out.println("Tentando excluir tarefa com ID: " + tarefaId);
+        Tarefa tarefa = tarefaRepository.findById(tarefaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada."));
+        tarefaRepository.delete(tarefa);
+        System.out.println("Tarefa excluída do banco de dados: " + tarefaId);
     }
 
 

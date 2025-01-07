@@ -1,31 +1,65 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import ContainerTask from "../ContainerTask";
 import "./MainLayout.css";
 import Filters from "../Filters";
+import api from "../../services/api"; // Importa o `api`
+import { AuthContext } from "../../context/AuthContext";
 
 interface Task {
-    taskId: number;
-    title: string;
-    description: string;
-    createdAt: string;
-    importanciaPrioridade: string;
+    tarefaId: number;
+    tarefaTitulo: string;
+    tarefaDescricao: string;
+    tarefaCriacaoAt: string;
+    tarefaImportanciaPrioridade: string;
 }
 
 const MainLayout: React.FC = () => {
+    const { token, user } = useContext(AuthContext); // Usa o AuthContext para autenticação
     const [tasks, setTasks] = useState<Task[]>([]);
     const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
+    useEffect(() => {
+        const loadTasks = async () => {
+            if (!token) {
+                setLoading(false);
+                return;
+            }
 
+            try {
+                setLoading(true);
+
+                // Substituição de axios por api
+                const response = await api.get("/api/tarefa/incomplete", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                const data = response.data;
+                if (data.length === 0) {
+                    setTasks([]);
+                    setFilteredTasks([]);
+                } else {
+                    setTasks(data);
+                    setFilteredTasks(data);
+                }
+            } catch (err: any) {
+                console.error("Erro ao carregar tarefas:", err.message);
+                setError("Erro ao carregar tarefas. Tente novamente.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadTasks();
+    }, [token]);
 
     const handleFilterChange = (filter: string) => {
         if (filter === "Todos") {
             setFilteredTasks(tasks);
         } else {
             setFilteredTasks(
-                tasks.filter((task) => task.importanciaPrioridade === filter)
+                tasks.filter((task) => task.tarefaImportanciaPrioridade === filter)
             );
         }
     };
@@ -34,12 +68,12 @@ const MainLayout: React.FC = () => {
         <div className="main-layout">
             <div className="header-section">
                 <h1 className="title">Tarefas</h1>
-                {isAuthenticated && <Filters onFilterChange={handleFilterChange} />}
+                {user && <Filters onFilterChange={handleFilterChange} />}
             </div>
             <div className="tasks-content">
                 {loading ? (
                     <p>Carregando tarefas...</p>
-                ) : !isAuthenticated ? (
+                ) : !user ? (
                     <p>Faça Login para ver as suas Tarefas.</p>
                 ) : tasks.length === 0 ? (
                     <p>Crie uma Tarefa nova.</p>
@@ -49,11 +83,11 @@ const MainLayout: React.FC = () => {
                     filteredTasks.map((task, index) => (
                         <ContainerTask
                             key={index}
-                            taskId={task.taskId}
-                            title={task.title}
-                            description={task.description}
-                            createdAt={task.createdAt}
-                            importanciaPrioridade={task.importanciaPrioridade}
+                            taskId={task.tarefaId}
+                            title={task.tarefaTitulo}
+                            description={task.tarefaDescricao}
+                            createdAt={task.tarefaCriacaoAt}
+                            importanciaPrioridade={task.tarefaImportanciaPrioridade}
                         />
                     ))
                 )}

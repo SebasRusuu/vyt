@@ -1,19 +1,53 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import ContainerTaskCompleted from "../ContainerTaskCompleted";
 import "../MainLayout/MainLayout.css";
+import api from "../../services/api";
+import { AuthContext } from "../../context/AuthContext";
 
 interface Task {
-    taskId: number;
-    title: string;
-    description: string;
-    createdAt: string;
-    importanciaPrioridade: string;
+    tarefaId: number;
+    tarefaTitulo: string;
+    tarefaDescricao: string;
+    tarefaCriacaoAt: string;
+    tarefaImportanciaPrioridade: string;
 }
 
 const MainLayoutCompleted: React.FC = () => {
+    const { token } = useContext(AuthContext);
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const loadTasks = async () => {
+            if (!token) {
+                setLoading(false);
+                return;
+            }
+
+            try {
+                setLoading(true);
+                const response = await api.get("/api/tarefa/completed", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                const data = response.data;
+                if (data.length === 0) {
+                    setTasks([]);
+                } else {
+                    setTasks(data);
+                }
+            } catch (err: any) {
+                console.error("Erro ao carregar tarefas:", err.message);
+                setError("Erro ao carregar tarefas. Tente novamente.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadTasks();
+    }, [token]);
+
 
 
 
@@ -33,11 +67,11 @@ const MainLayoutCompleted: React.FC = () => {
                     tasks.map((task, index) => (
                         <ContainerTaskCompleted
                             key={index}
-                            taskId={task.taskId}
-                            title={task.title}
-                            description={task.description}
-                            createdAt={task.createdAt}
-                            importanciaPrioridade={task.importanciaPrioridade}
+                            taskId={task.tarefaId}
+                            title={task.tarefaTitulo}
+                            description={task.tarefaDescricao}
+                            createdAt={task.tarefaCriacaoAt}
+                            importanciaPrioridade={task.tarefaImportanciaPrioridade}
                         />
                     ))
                 )}

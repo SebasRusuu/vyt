@@ -5,7 +5,10 @@ import org.springframework.stereotype.Repository;
 
 import com.iade.vyt.models.Tarefa;
 
+import java.util.List;
+
 
 @Repository
 public interface TarefaRepository extends JpaRepository<Tarefa, Integer> {
+    List<Tarefa> findByTarefaUserUserIdAndTarefaCompletada(int userId, boolean completada);
 }
