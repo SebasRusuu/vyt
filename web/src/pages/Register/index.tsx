@@ -8,9 +8,9 @@ import {
     MDBInput
 } from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
-import axios from "axios";
 import teste from '../../assets/teste2.png';
 import './register.css';
+import axiosInstance from "../../services/api";
 
 const Register: React.FC = () => {
   const [userName, setUserName] = useState("");
@@ -21,28 +21,28 @@ const Register: React.FC = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const handleRegister = async (event: React.FormEvent) => {
-      event.preventDefault();
-      setError(null);
+    const handleRegister = async (event: React.FormEvent) => {
+        event.preventDefault();
+        setError(null);
 
-    if (password !== confirmPassword) {
-      setMessage("Passwords do not match!");
-      return;
-    }
+        if (password !== confirmPassword) {
+            setMessage("Passwords do not match!");
+            return;
+        }
 
-      try {
-          const response = await axios.post('http://localhost:8080/api/auth/register', {
-              userName: userName, // Altere conforme necessário
-              email: email,
-              password: password
-          });
+        try {
+            const response = await axiosInstance.post('/auth/register', {
+                userName: userName,
+                email: email,
+                password: password
+            });
 
-          console.log("Registro bem-sucedido:", response.data);
-          navigate('/login');
-      } catch (error: any) {
-          console.error("Erro no registro:", error.response?.data || error.message);
-      }
-  };
+            console.log("Registro bem-sucedido:", response.data);
+            navigate('/login');
+        } catch (error: any) {
+            console.error("Erro no registro:", error.response?.data || error.message);
+        }
+    };
 
     return (
         <MDBContainer fluid>

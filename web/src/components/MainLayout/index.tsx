@@ -31,7 +31,7 @@ const MainLayout: React.FC = () => {
                 setLoading(true);
 
                 // Substituição de axios por api
-                const response = await api.get("/api/tarefa/incomplete", {
+                const response = await api.get("/tarefa/incomplete", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 

@@ -38,11 +38,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = getTokenFromRequest(request);
-        System.out.println("Token recebido no filtro: " + token);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
             String email = jwtTokenProvider.getUsernameFromToken(token);
-            System.out.println("Token válido. Email extraído: " + email);
 
             User user = userRepository.findByEmail(email).orElse(null);
             if (user != null) {
@@ -55,9 +53,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             } else {
                 System.out.println("Usuário não encontrado no banco de dados.");
             }
-        } else {
-            System.out.println("Token inválido ou não encontrado.");
         }
+
 
         filterChain.doFilter(request, response);
     }

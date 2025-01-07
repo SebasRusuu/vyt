@@ -99,7 +99,7 @@ public class UserController {
         String token = jwtTokenProvider.generateToken(user.getEmail(), user.getUserName());
 
         try {
-            response.sendRedirect("http://localhost:3000/?token=" + token);
+            response.sendRedirect("http://localhost:80/?token=" + token);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
