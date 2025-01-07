@@ -1,5 +1,7 @@
 package com.iade.vyt.filters;
 
+import com.iade.vyt.models.User;
+import com.iade.vyt.repositories.UserRepository;
 import com.iade.vyt.services.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,9 +19,11 @@ import java.util.Collections;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserRepository userRepository) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -28,14 +32,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = getTokenFromRequest(request);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            String username = jwtTokenProvider.getUsernameFromToken(token);
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String email = jwtTokenProvider.getUsernameFromToken(token); // O email é extraído do token
+            System.out.println("Token válido. Email extraído: " + email);
+
+            User user = userRepository.findByEmail(email).orElse(null);
+            if (user != null) {
+                System.out.println("Usuário encontrado. ID: " + user.getUserId());
+                request.setAttribute("user_id", user.getUserId()); // Configura o user_id no request
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                System.out.println("Usuário não encontrado no banco de dados.");
+            }
+        } else {
+            System.out.println("Nenhum token encontrado ou token inválido.");
         }
 
         filterChain.doFilter(request, response);
     }
+
 
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");

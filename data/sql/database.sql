@@ -6,14 +6,6 @@ CREATE TABLE IF NOT EXISTS uservyt(
     provider VARCHAR(50) DEFAULT 'local'
     );
 
-CREATE TABLE IF NOT EXISTS tokens(
-    token_id SERIAL PRIMARY KEY,
-    token_user_id INT NOT NULL,
-    token VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP,
-    FOREIGN KEY (token_user_id) REFERENCES uservyt(user_id)
-    );
 CREATE TABLE if not exists tarefas(
     tarefa_id serial primary key,
     tarefa_user_id int,
@@ -24,7 +16,6 @@ CREATE TABLE if not exists tarefas(
     tarefa_criacao_at timestamp,
     tarefa_completada boolean,
     FOREIGN KEY (tarefa_user_id) REFERENCES uservyt(user_id)
-
     );
 
 CREATE TABLE if not exists feedback(
