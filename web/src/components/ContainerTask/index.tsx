@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './ContainerTask.css';
 import { FaEdit, FaTrashAlt, FaCheck } from 'react-icons/fa';
-import { deleteTask, markTaskAsCompleted } from '../../services/taskService';
 import EditTask from '../EditTask';
 
 interface TaskProps {
@@ -83,17 +82,6 @@ const ContainerTask: React.FC<TaskProps> = ({
                     <div className="task-actions">
                         <button
                             className="check-task"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                markTaskAsCompleted(taskId)
-                                    .then(() => {
-                                        console.log('Tarefa marcada como completada!');
-                                        window.location.reload();
-                                    })
-                                    .catch((error) => {
-                                        console.log(error.message);
-                                    });
-                            }}
                         >
                             <FaCheck />
                         </button>
@@ -108,17 +96,6 @@ const ContainerTask: React.FC<TaskProps> = ({
                         </button>
                         <button
                             className="delete-task"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                deleteTask(taskId)
-                                    .then(() => {
-                                        console.log('Tarefa excluída com sucesso!');
-                                        window.location.reload();
-                                    })
-                                    .catch((error) => {
-                                        console.log(error.message);
-                                    });
-                            }}
                         >
                             <FaTrashAlt />
                         </button>

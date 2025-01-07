@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -10,13 +10,18 @@ import { AuthContext } from '../../context/AuthContext';
 function Header() {
     const { user, logout } = useContext(AuthContext); // Usando o AuthContext
     const navigate = useNavigate();
+    const [isTaskModalOpen, setTaskModalOpen] = useState(false); // Estado para o modal de tarefas
 
     const handleCreateTaskClick = () => {
         if (!user) {
             navigate('/login');
         } else {
-            console.log('Abrindo modal para criar nova tarefa');
+            setTaskModalOpen(true); // Abrir o modal
         }
+    };
+
+    const handleCloseTaskModal = () => {
+        setTaskModalOpen(false); // Fechar o modal
     };
 
     return (
@@ -86,7 +91,7 @@ function Header() {
                     </div>
                 </div>
             </header>
-            <NewTask isOpen={false} onClose={() => {}} />
+            <NewTask isOpen={isTaskModalOpen} onClose={handleCloseTaskModal} />
         </>
     );
 }

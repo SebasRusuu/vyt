@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "./NewTask.css";
-import { createTask } from "../../services/taskService";
 
 interface NewTaskProps {
     isOpen: boolean;
@@ -45,17 +45,33 @@ const NewTask: React.FC<NewTaskProps> = ({ isOpen, onClose }) => {
                 importanciaPrioridade = "Médio";
             }
 
-            await createTask({
-                tarefaTitulo: taskData.tarefaTitulo,
-                tarefaDescricao: taskData.tarefaDescricao,
-                tarefaImportanciaPrioridade: importanciaPrioridade,
-                tarefaPreferenciaTempo: taskData.tarefaPreferenciaTempo,
-            });
+            // Realizar o pedido POST para criar a tarefa
+            const token = localStorage.getItem("token");
+            if (!token) {
+                throw new Error("Token não encontrado. Por favor, faça login novamente.");
+            }
 
-            onClose();
-            window.location.reload();
+            await axios.post(
+                "http://localhost:8080/api/tarefa/create",
+                {
+                    tarefaTitulo: taskData.tarefaTitulo,
+                    tarefaDescricao: taskData.tarefaDescricao,
+                    tarefaImportanciaPrioridade: importanciaPrioridade,
+                    tarefaPreferenciaTempo: taskData.tarefaPreferenciaTempo,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            onClose(); // Fecha o modal
+            window.location.reload(); // Recarrega a página para atualizar a lista de tarefas
         } catch (err: any) {
-            setError(err.message);
+            console.error("Erro ao criar tarefa:", err);
+            setError(err.response?.data?.message || "Erro ao criar tarefa.");
         }
     };
 

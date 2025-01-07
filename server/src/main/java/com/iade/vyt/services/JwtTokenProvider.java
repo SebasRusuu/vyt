@@ -50,8 +50,9 @@ public class JwtTokenProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
-                .get("userName", String.class); // Obtém o campo "userName"
+                .getSubject();
     }
+
 
 
 }

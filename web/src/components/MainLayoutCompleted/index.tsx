@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import ContainerTaskCompleted from "../ContainerTaskCompleted";
-import { fetchCompletedTasks } from "../../services/taskService";
 import "../MainLayout/MainLayout.css";
 
 interface Task {
@@ -16,27 +15,7 @@ const MainLayoutCompleted: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const loadCompletedTasks = async () => {
-            try {
-                const data = await fetchCompletedTasks();
-                const formattedData = data.map((task: any) => ({
-                    taskId: task.tarefaId,
-                    title: task.tarefaTitulo,
-                    description: task.tarefaDescricao,
-                    createdAt: task.tarefaCriacaoAt,
-                    importanciaPrioridade: task.tarefaImportanciaPrioridade,
-                }));
-                setTasks(formattedData);
-            } catch (err: any) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
 
-        loadCompletedTasks();
-    }, []);
 
     return (
         <div className="main-layout">

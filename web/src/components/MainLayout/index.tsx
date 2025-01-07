@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import ContainerTask from "../ContainerTask";
-import { fetchIncompletedTasks } from "../../services/taskService";
 import "./MainLayout.css";
 import Filters from "../Filters";
 
@@ -19,51 +18,7 @@ const MainLayout: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-    useEffect(() => {
-        const checkAuthenticationAndLoadTasks = async () => {
-            const token = localStorage.getItem("authToken");
 
-            if (!token) {
-                setIsAuthenticated(false); // Utilizador não está autenticado
-                setLoading(false);
-                return;
-            }
-
-            try {
-                // Verificar se o token é válido
-                const payload = JSON.parse(atob(token.split(".")[1]));
-                if (!payload || !payload.user_id) {
-                    throw new Error("Token inválido");
-                }
-
-                setIsAuthenticated(true); // Utilizador autenticado
-
-                // Buscar tarefas do utilizador
-                const data = await fetchIncompletedTasks();
-                if (data.length === 0) {
-                    setTasks([]); // Sem tarefas
-                    setFilteredTasks([]);
-                } else {
-                    const formattedData = data.map((task: any) => ({
-                        taskId: task.tarefaId,
-                        title: task.tarefaTitulo,
-                        description: task.tarefaDescricao,
-                        createdAt: task.tarefaCriacaoAt,
-                        importanciaPrioridade: task.tarefaImportanciaPrioridade,
-                    }));
-                    setTasks(formattedData);
-                    setFilteredTasks(formattedData);
-                }
-            } catch (err: any) {
-                console.error("Erro ao carregar tarefas:", err.message);
-                setError(err.message); // Manter autenticação mesmo com erro
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        checkAuthenticationAndLoadTasks();
-    }, []);
 
     const handleFilterChange = (filter: string) => {
         if (filter === "Todos") {
