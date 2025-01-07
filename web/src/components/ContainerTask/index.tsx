@@ -52,7 +52,7 @@ const formatCreatedAt = (createdAt: string | undefined): string => {
 const markTaskAsCompleted = async (taskId: number, token: string): Promise<void> => {
     console.log("Tentando marcar tarefa como completa:", taskId);
     try {
-        const response = await api.put(`/api/tarefa/complete/${taskId}`, {}, {
+        const response = await api.put(`/tarefa/complete/${taskId}`, {}, {
             headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -65,7 +65,7 @@ const markTaskAsCompleted = async (taskId: number, token: string): Promise<void>
 const deleteTask = async (taskId: number, token: string) => {
     console.log("Tentando excluir tarefa:", taskId);
     try {
-        const response = await api.delete(`/api/tarefa/delete/${taskId}`, {
+        const response = await api.delete(`/tarefa/delete/${taskId}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
 

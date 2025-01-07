@@ -27,7 +27,7 @@ const MainLayoutCompleted: React.FC = () => {
 
             try {
                 setLoading(true);
-                const response = await api.get("/api/tarefa/completed", {
+                const response = await api.get("/tarefa/completed", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 

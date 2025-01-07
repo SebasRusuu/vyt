@@ -33,7 +33,7 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
     useEffect(() => {
         const loadTask = async () => {
             try {
-                const response = await api.get(`/api/tarefa/id/${taskId}`, {
+                const response = await api.get(`/tarefa/id/${taskId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -75,7 +75,7 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
 
             // Realizar o pedido PUT para atualizar a tarefa
             await api.put(
-                `/api/tarefa/update/${taskId}`,
+                `/tarefa/update/${taskId}`,
                 {
                     tarefaTitulo: formData.tarefaTitulo,
                     tarefaDescricao: formData.tarefaDescricao,
