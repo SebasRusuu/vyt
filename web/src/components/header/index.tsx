@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -6,22 +6,54 @@ import logo from '../../assets/MiniVerde.png';
 import './header.css';
 import NewTask from '../NewTask';
 import { AuthContext } from '../../context/AuthContext';
+import * as bootstrap from 'bootstrap';
 
 function Header() {
-    const { user, logout } = useContext(AuthContext); // Usando o AuthContext
+    const { user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
-    const [isTaskModalOpen, setTaskModalOpen] = useState(false); // Estado para o modal de tarefas
+    const [isTaskModalOpen, setTaskModalOpen] = useState(false);
+    const offcanvasRef = useRef<HTMLDivElement>(null);
+
+    const removeBurgerFocus = () => {
+        const toggler = document.querySelector('.navbar-toggler');
+        if (toggler) {
+            (toggler as HTMLElement).blur();
+            toggler.setAttribute('tabindex', '-1');
+        }
+    };
+
+    const closeOffcanvas = () => {
+        if (offcanvasRef.current) {
+            const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasRef.current);
+            if (offcanvas) {
+                offcanvas.hide();
+            }
+        }
+        removeBurgerFocus();
+        // Remove manualmente o overlay da shadowbox
+        const overlay = document.querySelector('.offcanvas-backdrop');
+        if (overlay) {
+            overlay.remove();
+        }
+    };
 
     const handleCreateTaskClick = () => {
         if (!user) {
             navigate('/login');
         } else {
-            setTaskModalOpen(true); // Abrir o modal
+            setTaskModalOpen(true);
+            closeOffcanvas();
         }
     };
 
+    const handleLogoutClick = () => {
+        logout();
+        closeOffcanvas();
+    };
+
     const handleCloseTaskModal = () => {
-        setTaskModalOpen(false); // Fechar o modal
+        setTaskModalOpen(false);
+        closeOffcanvas();
     };
 
     return (
@@ -47,6 +79,7 @@ function Header() {
                         tabIndex={-1}
                         id="navbarOffcanvasLg"
                         aria-labelledby="navbarOffcanvasLgLabel"
+                        ref={offcanvasRef}
                     >
                         <div className="offcanvas-header">
                             <button
@@ -54,6 +87,7 @@ function Header() {
                                 className="btn-close"
                                 data-bs-dismiss="offcanvas"
                                 aria-label="Close"
+                                onClick={removeBurgerFocus}
                             ></button>
                         </div>
                         <div className="offcanvas-body container">
@@ -62,7 +96,7 @@ function Header() {
                                     {user ? (
                                         <>
                                             <span className="nav-link">Olá, {user}</span>
-                                            <span className="nav-link" onClick={logout}>
+                                            <span className="nav-link" onClick={handleLogoutClick}>
                                                 Logout
                                             </span>
                                         </>
@@ -81,6 +115,7 @@ function Header() {
                                             borderRadius: '20px',
                                             padding: '3px 15px',
                                             color: '#FFFFFF',
+                                            cursor: 'pointer'
                                         }}
                                     >
                                         Criar Nova Tarefa
