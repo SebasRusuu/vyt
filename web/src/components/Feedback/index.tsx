@@ -8,6 +8,7 @@ interface FeedbackProps {
 
 const Feedback: React.FC<FeedbackProps> = ({ isOpen, onClose }) => {
     const [rating, setRating] = useState<number | null>(null);
+    const [comment, setComment] = useState<string>("");
 
     if (!isOpen) return null;
 
@@ -20,7 +21,7 @@ const Feedback: React.FC<FeedbackProps> = ({ isOpen, onClose }) => {
         <div className="feedback-popup">
             <h3>Dê seu Feedback</h3>
             <div className="rating">
-                {[1, 2, 3, 4, 5].map((value) => (
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
                     <button
                         key={value}
                         className={rating === value ? "active" : ""}
@@ -30,6 +31,11 @@ const Feedback: React.FC<FeedbackProps> = ({ isOpen, onClose }) => {
                     </button>
                 ))}
             </div>
+            <textarea
+                placeholder="Escreva seu feedback aqui..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+            />
             <button
                 className="submit"
                 onClick={handleSubmit}

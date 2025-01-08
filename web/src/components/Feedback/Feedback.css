@@ -4,10 +4,11 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background: white;
-    border-radius: 8px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    width: 300px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    width: 600px;
+    height: 400px;
     text-align: center;
     z-index: 1000;
 }
@@ -18,24 +19,8 @@
     margin-bottom: 10px;
 }
 
-.feedback-popup .rating {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 15px;
-}
 
-.feedback-popup .rating button {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #e0e0e0; /* Cor padrão */
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background 0.3s ease, color 0.3s ease;
-    color: black; /* Cor do texto padrão */
-}
+
 
 /* Hover para cada nível de feedback */
 .feedback-popup .rating button:nth-child(1):hover {
@@ -44,23 +29,48 @@
 }
 
 .feedback-popup .rating button:nth-child(2):hover {
-    background: #ff7f00; /* Laranja */
+    background: #ff5722; /* Laranja */
     color: white;
 }
 
 .feedback-popup .rating button:nth-child(3):hover {
-    background: #ffff00; /* Amarelo */
-    color: black; /* Contraste no amarelo */
+    background: #ff9800; /* Laranja claro */
+    color: white;
 }
 
 .feedback-popup .rating button:nth-child(4):hover {
-    background: #90ee90; /* Verde claro */
-    color: black;
+    background: #ffc107; /* Amarelo */
+    color: white;
 }
 
 .feedback-popup .rating button:nth-child(5):hover {
-    background: #4caf50; /* Verde padrão */
-    color: white;
+    background: #ffeb3b; /* Amarelo claro */
+    color: black;
+}
+
+.feedback-popup .rating button:nth-child(6):hover {
+    background: #cddc39; /* Verde limão */
+    color: black;
+}
+
+.feedback-popup .rating button:nth-child(7):hover {
+    background: #8bc34a; /* Verde claro */
+    color: black;
+}
+
+.feedback-popup .rating button:nth-child(8):hover {
+    background: #51a854; /* Verde */
+    color: rgb(0, 0, 0);
+}
+
+.feedback-popup .rating button:nth-child(9):hover {
+    background: #46b94a; /* Verde azulado */
+    color: rgb(0, 0, 0);
+}
+
+.feedback-popup .rating button:nth-child(10):hover {
+    background: #0fac14; /* Azul claro */
+    color: rgb(0, 0, 0);
 }
 
 /* Estado ativo (apenas ao clicar) */
@@ -83,4 +93,41 @@
 
 .feedback-popup button.submit:hover {
     background: #3a8f8e;
+}
+
+.feedback-popup .rating {
+    display: flex;
+    justify-content: center;
+    gap: 12px; /* Aumenta o espaçamento entre botões */
+    margin-bottom: 20px;
+}
+
+.feedback-popup .rating button {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: black;
+    transition: background 0.3s ease, transform 0.2s;
+
+}
+
+
+.feedback-popup textarea {
+    width: 90%;
+    margin: 0 auto 20px;
+    display: block;
+    width: 500px;
+    border-radius: 15px;
+    height: 150px;
+}
+
+.feedback-popup button.submit {
+    margin-top: 10px;
+    padding: 12px 20px;
+    font-size: 16px;
+    align-self: center; /* Centraliza em relação ao pop-up */
 }

@@ -149,13 +149,14 @@ const NewTask: React.FC<NewTaskProps> = ({ isOpen, onClose }) => {
                         </select>
                     </div>
                     <div className="edit-task-field">
-                        <label htmlFor="tarefaDataConclusao">Data de Conclusão</label>
+                        <label htmlFor="tarefaDataConclusao">Data Prevista</label>
                         <input
                             type="date"
                             id="tarefaDataConclusao"
                             name="tarefaDataConclusao"
                             value={taskData.tarefaDataConclusao}
                             onChange={handleChange}
+                            required
                         />
                     </div>
                     <div className="mb-3">
