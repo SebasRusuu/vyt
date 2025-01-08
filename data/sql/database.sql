@@ -20,11 +20,9 @@ CREATE TABLE if not exists tarefas(
 
 CREATE TABLE if not exists feedback(
     feedback_id serial primary key,
-    feedback_user_id int,
     feedback_tarefa_id int,
-    feedback_performance int,
-    feedback_comentario VARCHAR(50),
-    FOREIGN KEY (feedback_user_id) REFERENCES uservyt(user_id),
+    feedback_valor int NOT NULL,
+    feedback_comentario VARCHAR(100),
     FOREIGN KEY (feedback_tarefa_id) REFERENCES tarefas(tarefa_id)
     );
 

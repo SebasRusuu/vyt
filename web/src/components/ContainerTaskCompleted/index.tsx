@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import "../ContainerTask/ContainerTask.css";
+import TaskDetails from "../TaskDetails";
 
 interface TaskProps {
     taskId: number;
@@ -26,9 +27,8 @@ const getImportantColor = (importanciaPrioridade: string) => {
 
 const formatConclusaoAt = (dataConclusao: string | undefined): JSX.Element => {
     if (!dataConclusao) return <>No date available</>;
-    // Mostra a data no formato Dia da semana "<br />" dd/mm/aaaa
     const date = new Date(dataConclusao);
-    const day = date.toLocaleDateString('pt-BR', { weekday: 'long' });
+    const day = date.toLocaleDateString("pt-BR", { weekday: "long" });
     return (
         <>
             {day}
@@ -38,20 +38,47 @@ const formatConclusaoAt = (dataConclusao: string | undefined): JSX.Element => {
     );
 };
 
+const ContainerTaskCompleted: React.FC<TaskProps> = ({
+                                                         taskId,
+                                                         title,
+                                                         description,
+                                                         conclusionDate,
+                                                         importanciaPrioridade,
+                                                     }) => {
+    const [isTaskDetailsOpen, setIsTaskDetailsOpen] = useState(false);
 
+    const handleOpenTaskDetails = () => {
+        setIsTaskDetailsOpen(true);
+    };
 
-const ContainerTaskCompleted: React.FC<TaskProps> = ({ title, description, conclusionDate, importanciaPrioridade }) => {
+    const handleCloseTaskDetails = () => {
+        setIsTaskDetailsOpen(false);
+    };
+
     return (
-        <div className="task-container">
-            <h4 className="task-title">{title}</h4>
-            <p className="task-description">{description}</p>
-            <div className="task-footer">
-                <p className="task-date">{formatConclusaoAt(conclusionDate)}</p>
-                <p className={`task-important ${getImportantColor(importanciaPrioridade)}`}>
-                    {getImportantLabel(importanciaPrioridade)}
-                </p>
+        <>
+            <div className="task-container" onClick={handleOpenTaskDetails}>
+                <h4 className="task-title">{title}</h4>
+                <p className="task-description">{description}</p>
+                <div className="task-footer">
+                    <p className="task-date">{formatConclusaoAt(conclusionDate)}</p>
+                    <p
+                        className={`task-important ${getImportantColor(
+                            importanciaPrioridade
+                        )}`}
+                    >
+                        {getImportantLabel(importanciaPrioridade)}
+                    </p>
+                </div>
             </div>
-        </div>
+            {isTaskDetailsOpen && (
+                <TaskDetails
+                    isOpen={isTaskDetailsOpen}
+                    onClose={handleCloseTaskDetails}
+                    tarefaId={taskId}
+                />
+            )}
+        </>
     );
 };
 

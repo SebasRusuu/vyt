@@ -29,15 +29,11 @@ public class Feedback {
     private int feedbackId;
 
     @ManyToOne
-    @JoinColumn(name = "feedback_user_id", referencedColumnName = "user_id")
-    private User feedbackUser;
-
-    @ManyToOne
     @JoinColumn(name = "feedback_tarefa_id", referencedColumnName = "tarefa_id")
     private Tarefa feedbackTarefa;
 
-    @Column(name = "feedback_performance")
-    private int feedbackPerformance;
+    @Column(name = "feedback_valor")
+    private int feedbackValor;
 
     @Column(name = "feedback_comentario")
     private String feedbackComentario;
