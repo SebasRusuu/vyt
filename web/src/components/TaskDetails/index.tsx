@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./TaskDetails.css";
-import api from "../../services/api";
+import axiosInstance from "../../services/api";
 
 interface TaskDetailsProps {
     isOpen: boolean;
@@ -19,11 +19,11 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ isOpen, onClose, tarefaId }) 
         const fetchDetails = async () => {
             try {
                 // Buscar informações da tarefa
-                const taskResponse = await api.get(`/tarefa/id/${tarefaId}`);
+                const taskResponse = await axiosInstance.get(`/tarefa/id/${tarefaId}`);
                 setTaskDetails(taskResponse.data);
 
                 // Buscar informações do feedback
-                const feedbackResponse = await api.get(`/feedback/tarefa/${tarefaId}`);
+                const feedbackResponse = await axiosInstance.get(`/feedback/tarefa/${tarefaId}`);
                 setFeedbackDetails(feedbackResponse.data);
             } catch (err: any) {
                 console.error("Erro ao buscar detalhes:", err.message);

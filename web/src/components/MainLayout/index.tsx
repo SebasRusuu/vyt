@@ -2,8 +2,8 @@ import React, { useEffect, useState, useContext } from "react";
 import ContainerTask from "../ContainerTask";
 import "./MainLayout.css";
 import Filters from "../Filters";
-import api from "../../services/api"; // Importa o `api`
 import { AuthContext } from "../../context/AuthContext";
+import axiosInstance from "../../services/api";
 
 interface Task {
     tarefaId: number;
@@ -31,7 +31,7 @@ const MainLayout: React.FC = () => {
                 setLoading(true);
 
                 // Substituição de axios por api
-                const response = await api.get("/tarefa/incomplete", {
+                const response = await axiosInstance.get("/tarefa/incomplete", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 

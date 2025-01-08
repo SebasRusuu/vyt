@@ -12,6 +12,9 @@ x-postgres-common:
 services:
   postgres_primary:
     <<: *postgres-common
+    build:
+      context: .
+      dockerfile: data/Dockerfile
     container_name: DB_MASTER
     ports:
       - 5432:5432
@@ -22,12 +25,12 @@ services:
       POSTGRES_HOST_AUTH_METHOD: "scram-sha-256\nhost replication all 0.0.0.0/0 md5"
       POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
     command: |
-        postgres
-        -c wal_level=replica
-        -c hot_standby=on
-        -c max_wal_senders=10
-        -c max_replication_slots=10
-        -c hot_standby_feedback=on
+      postgres
+      -c wal_level=logical
+      -c hot_standby=on
+      -c max_wal_senders=10
+      -c max_replication_slots=10
+      -c shared_preload_libraries=pglogical
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./00_init.sql:/docker-entrypoint-initdb.d/00_init.sql
@@ -37,6 +40,9 @@ services:
 
   postgres_replica:
     <<: *postgres-common
+    build:
+      context: .
+      dockerfile: data/Dockerfile
     container_name: DB_REPLICA
     ports:
       - 5433:5432
@@ -45,18 +51,37 @@ services:
       PGPASSWORD: replicator_password
     command: |
       bash -c "
-      until pg_basebackup --pgdata=/var/lib/postgresql/data -R --slot=replication_slot --host=postgres_primary --port=5432
-      do
-      echo 'Waiting for primary to connect...'
-      sleep 1s
-      done
-      echo 'Backup done, starting replica...'
+      if [ -z \"$(ls -A /var/lib/postgresql/data)\" ]; then
+        until pg_basebackup --pgdata=/var/lib/postgresql/data -R --slot=replication_slot --host=DB_MASTER --port=5432 --username=replicator --progress
+        do
+          echo 'Waiting for primary to connect...'
+          sleep 1s
+        done
+        echo 'Backup done, starting replica...'
+      else
+        echo 'Data directory is not empty, starting replica...'
+      fi
       chmod 0700 /var/lib/postgresql/data
       postgres
       "
+    volumes:
+      - pg_slave_data:/var/lib/postgresql/data
     depends_on:
       postgres_primary:
         condition: service_healthy
+    networks:
+      - app_net
+
+  monitor:
+    image: alpine:latest
+    container_name: monitor
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./monitor.sh:/monitor.sh
+    command: [ "sh", "-c", "apk add --no-cache docker-cli postgresql-client && sh /monitor.sh" ]
+    depends_on:
+      - postgres_primary
+      - postgres_replica
     networks:
       - app_net
 
@@ -76,19 +101,19 @@ services:
       - app_net
 
   web-2:
-      build:
-        context: ./web
-      container_name: web_2
-      ports:
-        - "3002:3000"
-      environment:
-        SPRING_DATASOURCE_URL: jdbc:postgresql://DB_MASTER:5432/vytdb
-        SPRING_DATASOURCE_USERNAME: postgres
-        SPRING_DATASOURCE_PASSWORD: foobar
-      depends_on:
-        - backend
-      networks:
-        - app_net
+    build:
+      context: ./web
+    container_name: web_2
+    ports:
+      - "3002:3000"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://DB_MASTER:5432/vytdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: foobar
+    depends_on:
+      - backend
+    networks:
+      - app_net
 
   backend:
     build:
@@ -98,16 +123,43 @@ services:
       - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://DB_MASTER:5432/vytdb
+      SPRING_DATASOURCE_REPLICA_URL: jdbc:postgresql://DB_REPLICA:5432/vytdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: foobar
     env_file:
       - ./server/.env
     volumes:
-        - ./server/.env:/server/.env:ro
+      - ./server/.env:/server/.env:ro
     depends_on:
-        - postgres_primary
+      - postgres_primary
     networks:
-        - app_net
+      - app_net
+
+  backend-2:
+    build:
+      context: ./server
+    container_name: backend-2
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://DB_MASTER:5432/vytdb
+      SPRING_DATASOURCE_REPLICA_URL: jdbc:postgresql://DB_REPLICA:5432/vytdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: foobar
+    env_file:
+      - ./server/.env
+    volumes:
+      - ./server/.env:/server/.env:ro
+    depends_on:
+      postgres_primary:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - app_net
 
   nginx:
     image: nginx:latest
@@ -116,19 +168,21 @@ services:
       - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/html:/usr/share/nginx/html
     depends_on:
       - web-1
       - web-2
       - backend
+      - backend-2
+      - postgres_replica
     networks:
       - app_net
-
 
 volumes:
   postgres_data:
     name: postgres_data
-  postgres_replica_data:
-    name: postgres_replica_data
+  pg_slave_data:
+    name: pg_slave_data
   nginx_data:
     name: nginx_data
 
