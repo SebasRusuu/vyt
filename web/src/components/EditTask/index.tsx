@@ -172,7 +172,7 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
                         </select>
                     </div>
                     <div className="edit-task-field">
-                        <label htmlFor="tarefaDataConclusao">Data de Conclusão</label>
+                        <label htmlFor="tarefaDataConclusao">Data Prevista</label>
                         <input
                             type="date"
                             id="tarefaDataConclusao"
