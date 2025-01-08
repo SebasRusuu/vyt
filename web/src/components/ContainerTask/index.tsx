@@ -1,11 +1,10 @@
 import React, { useState, useContext } from 'react';
 import './ContainerTask.css';
-import { FaEdit, FaTrashAlt, FaCheck } from 'react-icons/fa';
+import { FaTrashAlt, FaCheck } from 'react-icons/fa';
 import EditTask from '../EditTask';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
-import Feedback from "../Feedback";
-
+import Feedback from '../Feedback';
 
 interface TaskProps {
     taskId: number;
@@ -32,7 +31,6 @@ const getImportantColor = (importanciaPrioridade: string) => {
 
 const formatConclusaoAt = (dataConclusao: string | undefined): JSX.Element => {
     if (!dataConclusao) return <>No date available</>;
-    // Mostra a data no formato Dia da semana "<br />" dd/mm/aaaa
     const date = new Date(dataConclusao);
     const day = date.toLocaleDateString('pt-PT', { weekday: 'long' });
     return (
@@ -44,53 +42,48 @@ const formatConclusaoAt = (dataConclusao: string | undefined): JSX.Element => {
     );
 };
 
-
 const markTaskAsCompleted = async (taskId: number, token: string): Promise<void> => {
-    console.log("Tentando marcar tarefa como completa:", taskId);
+    console.log('Tentando marcar tarefa como completa:', taskId);
     try {
         const response = await api.put(`/tarefa/complete/${taskId}`, {}, {
             headers: { Authorization: `Bearer ${token}` },
         });
-
-        console.log("Resposta da API ao completar tarefa:", response.status);
+        console.log('Resposta da API ao completar tarefa:', response.status);
     } catch (error: any) {
-        console.error("Erro ao marcar a tarefa como completada:", error);
+        console.error('Erro ao marcar a tarefa como completada:', error);
     }
 };
 
 const deleteTask = async (taskId: number, token: string) => {
-    console.log("Tentando excluir tarefa:", taskId);
+    console.log('Tentando excluir tarefa:', taskId);
     try {
         const response = await api.delete(`/tarefa/delete/${taskId}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
-
-        console.log("Resposta da API ao excluir tarefa:", response.status);
+        console.log('Resposta da API ao excluir tarefa:', response.status);
         return response.data;
     } catch (error: any) {
-        console.error("Erro ao excluir a tarefa:", error);
+        console.error('Erro ao excluir a tarefa:', error);
     }
 };
 
-
 const ContainerTask: React.FC<TaskProps> = ({
-                                               taskId,
-                                               title,
-                                               description,
-                                               conclusionDate,
-                                               importanciaPrioridade,
-                                           }) => {
+                                                taskId,
+                                                title,
+                                                description,
+                                                conclusionDate,
+                                                importanciaPrioridade,
+                                            }) => {
     const { token } = useContext(AuthContext); // Obtém o token do contexto
     const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
     const handleClosePopup = () => {
-        setIsEditPopupOpen(false); // Centraliza o fecho do popup
+        setIsEditPopupOpen(false);
     };
 
     const handleCompleteTask = async (e: React.MouseEvent) => {
-        e.stopPropagation(); // Evita que o evento clique afete elementos externos
-
+        e.stopPropagation();
         if (!token) {
             console.log('Token não encontrado no contexto!');
             return;
@@ -99,23 +92,31 @@ const ContainerTask: React.FC<TaskProps> = ({
         try {
             await markTaskAsCompleted(taskId, token);
         } catch (error) {
-            console.error("Erro ao marcar a tarefa como completada:", error);
+            console.error('Erro ao marcar a tarefa como completada:', error);
         } finally {
-            // Exibe o pop-up de feedback mesmo se ocorrer um erro na conclusão
             setIsFeedbackOpen(true);
         }
     };
 
-    const handleFeedbackClose = (rating: number | null) => {
+    const handleFeedbackClose = async (rating: number | null, comment: string) => {
         if (rating !== null) {
-            console.log(`Feedback para a tarefa ${taskId}: ${rating}/5`);
+            try {
+                // Enviar feedback ao backend
+                await api.post(`/feedback/${taskId}`, {
+                    feedbackValor: rating,
+                    feedbackComentario: comment,
+                });
+                console.log(`Feedback para a tarefa ${taskId}: ${rating}/10, comentário: "${comment}"`);
+            } catch (error) {
+                console.error('Erro ao salvar feedback:', error);
+            }
         }
         setIsFeedbackOpen(false); // Fecha o pop-up de Feedback
     };
 
     return (
         <>
-            <div className="task-container" onClick={(e) => {e.stopPropagation();setIsEditPopupOpen(true);}}>
+            <div className="task-container" onClick={(e) => { e.stopPropagation(); setIsEditPopupOpen(true); }}>
                 <div className="task-header">
                     <h4 className="task-title">{title}</h4>
                     <p
@@ -130,18 +131,9 @@ const ContainerTask: React.FC<TaskProps> = ({
                     <div className="task-actions">
                         <button
                             className="check-task"
-                            onClick={handleCompleteTask} // Chamando Feedback após completar a tarefa
+                            onClick={handleCompleteTask}
                         >
-                            <FaCheck/>
-                        </button>
-                        <button
-                            className="edit-task"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setIsEditPopupOpen(true);
-                            }}
-                        >
-                            <FaEdit/>
+                            <FaCheck />
                         </button>
                         <button
                             className="delete-task"
@@ -160,27 +152,35 @@ const ContainerTask: React.FC<TaskProps> = ({
                                 }
                             }}
                         >
-                            <FaTrashAlt/>
+                            <FaTrashAlt />
                         </button>
                     </div>
                 </div>
             </div>
             {/* Feedback Popup */}
-            <Feedback isOpen={isFeedbackOpen} onClose={handleFeedbackClose} />
+            {isFeedbackOpen && (
+                <div className="feedback-overlay">
+                    <Feedback
+                        isOpen={isFeedbackOpen}
+                        onClose={() => setIsFeedbackOpen(false)}
+                        tarefaId={taskId}
+                    />
+                </div>
+            )}
 
             {/* Edit Popup */}
             {isEditPopupOpen && (
                 <div
                     className="popup-overlay"
-                    onClick={handleClosePopup} // Fechar ao clicar fora
+                    onClick={handleClosePopup}
                 >
                     <div
                         className="popup-content"
-                        onClick={(e) => e.stopPropagation()} // Previne fecho ao clicar dentro
+                        onClick={(e) => e.stopPropagation()}
                     >
                         <EditTask
                             taskId={taskId}
-                            onClose={handleClosePopup} // Callback para fechar o popup
+                            onClose={handleClosePopup}
                         />
                     </div>
                 </div>
