@@ -14,6 +14,7 @@ const NewTask: React.FC<NewTaskProps> = ({ isOpen, onClose }) => {
         tarefaImportancia: "Pouco Importante", // Valor padrão
         tarefaPrioridade: "Não Urgente", // Valor padrão
         tarefaPreferenciaTempo: "00:30:00", // Valor padrão
+        tarefaDataConclusao: "",
     });
     const [error, setError] = useState<string | null>(null);
 
@@ -58,6 +59,7 @@ const NewTask: React.FC<NewTaskProps> = ({ isOpen, onClose }) => {
                     tarefaDescricao: taskData.tarefaDescricao,
                     tarefaImportanciaPrioridade: importanciaPrioridade,
                     tarefaPreferenciaTempo: taskData.tarefaPreferenciaTempo,
+                    tarefaDataConclusao: taskData.tarefaDataConclusao,
                 },
                 {
                     headers: {
@@ -146,6 +148,16 @@ const NewTask: React.FC<NewTaskProps> = ({ isOpen, onClose }) => {
                             <option value="Urgente">Urgente</option>
                         </select>
                     </div>
+                    <div className="edit-task-field">
+                        <label htmlFor="tarefaDataConclusao">Data de Conclusão</label>
+                        <input
+                            type="date"
+                            id="tarefaDataConclusao"
+                            name="tarefaDataConclusao"
+                            value={taskData.tarefaDataConclusao}
+                            onChange={handleChange}
+                        />
+                    </div>
                     <div className="mb-3">
                         <label htmlFor="tarefaPreferenciaTempo" className="form-label">
                             Duração
@@ -167,7 +179,7 @@ const NewTask: React.FC<NewTaskProps> = ({ isOpen, onClose }) => {
                         Criar Tarefa
                     </button>
                 </form>
-                {error && <p style={{ color: "red" }}>{error}</p>}
+                {error && <p style={{color: "red"}}>{error}</p>}
             </div>
         </div>
     );

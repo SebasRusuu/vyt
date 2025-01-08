@@ -9,7 +9,7 @@ interface Task {
     tarefaId: number;
     tarefaTitulo: string;
     tarefaDescricao: string;
-    tarefaCriacaoAt: string;
+    tarefaDataConclusao: string;
     tarefaImportanciaPrioridade: string;
 }
 
@@ -86,7 +86,7 @@ const MainLayout: React.FC = () => {
                             taskId={task.tarefaId}
                             title={task.tarefaTitulo}
                             description={task.tarefaDescricao}
-                            createdAt={task.tarefaCriacaoAt}
+                            conclusionDate={task.tarefaDataConclusao} // Atualizado para usar a nova coluna
                             importanciaPrioridade={task.tarefaImportanciaPrioridade}
                         />
                     ))

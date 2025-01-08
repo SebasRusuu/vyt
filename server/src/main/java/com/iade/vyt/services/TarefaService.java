@@ -67,6 +67,7 @@ public class TarefaService {
         tarefaToUpdate.setTarefaDescricao(tarefa.getTarefaDescricao());
         tarefaToUpdate.setTarefaImportanciaPrioridade(tarefa.getTarefaImportanciaPrioridade());
         tarefaToUpdate.setTarefaPreferenciaTempo(tarefa.getTarefaPreferenciaTempo());
+        tarefaToUpdate.setTarefaDataConclusao(tarefa.getTarefaDataConclusao()); // Atualiza a data de conclusão
         return tarefaRepository.save(tarefaToUpdate);
     }
 

@@ -8,7 +8,7 @@ interface Task {
     tarefaId: number;
     tarefaTitulo: string;
     tarefaDescricao: string;
-    tarefaCriacaoAt: string;
+    tarefaDataConclusao: string;
     tarefaImportanciaPrioridade: string;
 }
 
@@ -70,7 +70,7 @@ const MainLayoutCompleted: React.FC = () => {
                             taskId={task.tarefaId}
                             title={task.tarefaTitulo}
                             description={task.tarefaDescricao}
-                            createdAt={task.tarefaCriacaoAt}
+                            conclusionDate={task.tarefaDataConclusao}
                             importanciaPrioridade={task.tarefaImportanciaPrioridade}
                         />
                     ))

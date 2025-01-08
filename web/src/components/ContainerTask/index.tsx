@@ -4,13 +4,14 @@ import { FaEdit, FaTrashAlt, FaCheck } from 'react-icons/fa';
 import EditTask from '../EditTask';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
+import Feedback from "../Feedback";
 
 
 interface TaskProps {
     taskId: number;
     title: string;
     description: string;
-    createdAt: string;
+    conclusionDate: string;
     importanciaPrioridade: string;
 }
 
@@ -29,25 +30,20 @@ const getImportantColor = (importanciaPrioridade: string) => {
     }
 };
 
-const formatCreatedAt = (createdAt: string | undefined): string => {
-    if (!createdAt) return 'No date available';
-
-    try {
-        const taskDate = new Date(createdAt);
-        if (isNaN(taskDate.getTime())) return 'Invalid date';
-
-        const today = new Date();
-        const differenceInDays = Math.floor(
-            (today.getTime() - taskDate.getTime()) / (1000 * 3600 * 24)
-        );
-
-        if (differenceInDays === 0) return 'Hoje';
-        if (differenceInDays === 1) return 'Ontem';
-        return `${differenceInDays} dias atrás`;
-    } catch (e) {
-        return 'Invalid date';
-    }
+const formatConclusaoAt = (dataConclusao: string | undefined): JSX.Element => {
+    if (!dataConclusao) return <>No date available</>;
+    // Mostra a data no formato Dia da semana "<br />" dd/mm/aaaa
+    const date = new Date(dataConclusao);
+    const day = date.toLocaleDateString('pt-PT', { weekday: 'long' });
+    return (
+        <>
+            {day}
+            <br />
+            {`${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`}
+        </>
+    );
 };
+
 
 const markTaskAsCompleted = async (taskId: number, token: string): Promise<void> => {
     console.log("Tentando marcar tarefa como completa:", taskId);
@@ -81,55 +77,62 @@ const ContainerTask: React.FC<TaskProps> = ({
                                                taskId,
                                                title,
                                                description,
-                                               createdAt,
+                                               conclusionDate,
                                                importanciaPrioridade,
                                            }) => {
     const { token } = useContext(AuthContext); // Obtém o token do contexto
     const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
+    const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
     const handleClosePopup = () => {
         setIsEditPopupOpen(false); // Centraliza o fecho do popup
     };
 
+    const handleCompleteTask = async (e: React.MouseEvent) => {
+        e.stopPropagation(); // Evita que o evento clique afete elementos externos
+
+        if (!token) {
+            console.log('Token não encontrado no contexto!');
+            return;
+        }
+
+        try {
+            await markTaskAsCompleted(taskId, token);
+        } catch (error) {
+            console.error("Erro ao marcar a tarefa como completada:", error);
+        } finally {
+            // Exibe o pop-up de feedback mesmo se ocorrer um erro na conclusão
+            setIsFeedbackOpen(true);
+        }
+    };
+
+    const handleFeedbackClose = (rating: number | null) => {
+        if (rating !== null) {
+            console.log(`Feedback para a tarefa ${taskId}: ${rating}/5`);
+        }
+        setIsFeedbackOpen(false); // Fecha o pop-up de Feedback
+    };
+
     return (
         <>
-            <div
-                className="task-container"
-                onClick={(e) => {
-                    e.stopPropagation(); // Previne cliques indesejados
-                    setIsEditPopupOpen(true);
-                }}
-            >
-                <h4 className="task-title">{title}</h4>
-                <p className="task-description">{description}</p>
-                <div className="task-footer">
-                    <p className="task-date">{formatCreatedAt(createdAt)}</p>
+            <div className="task-container" onClick={(e) => {e.stopPropagation();setIsEditPopupOpen(true);}}>
+                <div className="task-header">
+                    <h4 className="task-title">{title}</h4>
                     <p
-                        className={`task-important ${getImportantColor(
-                            importanciaPrioridade
-                        )}`}
+                        className={`task-important ${getImportantColor(importanciaPrioridade)}`}
                     >
                         {getImportantLabel(importanciaPrioridade)}
                     </p>
+                </div>
+                <p className="task-description">{description}</p>
+                <div className="task-footer">
+                    <p className="task-date">{formatConclusaoAt(conclusionDate)}</p>
                     <div className="task-actions">
                         <button
                             className="check-task"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                if (token) {
-                                    markTaskAsCompleted(taskId, token)
-                                        .then(() => {
-                                            window.location.reload();
-                                        })
-                                        .catch((error) => {
-                                            console.log(error.message);
-                                        });
-                                } else {
-                                    console.log('Token não encontrado no contexto!');
-                                }
-                            }}
+                            onClick={handleCompleteTask} // Chamando Feedback após completar a tarefa
                         >
-                            <FaCheck />
+                            <FaCheck/>
                         </button>
                         <button
                             className="edit-task"
@@ -138,7 +141,7 @@ const ContainerTask: React.FC<TaskProps> = ({
                                 setIsEditPopupOpen(true);
                             }}
                         >
-                            <FaEdit />
+                            <FaEdit/>
                         </button>
                         <button
                             className="delete-task"
@@ -157,13 +160,15 @@ const ContainerTask: React.FC<TaskProps> = ({
                                 }
                             }}
                         >
-                            <FaTrashAlt />
+                            <FaTrashAlt/>
                         </button>
                     </div>
                 </div>
             </div>
+            {/* Feedback Popup */}
+            <Feedback isOpen={isFeedbackOpen} onClose={handleFeedbackClose} />
 
-            {/* Overlay e Popup */}
+            {/* Edit Popup */}
             {isEditPopupOpen && (
                 <div
                     className="popup-overlay"

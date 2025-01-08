@@ -4,8 +4,8 @@ package com.iade.vyt.models;
 import jakarta.persistence.*;
 import lombok.*;
 import java.sql.Time;
-import java.sql.Timestamp;
-import org.hibernate.annotations.CreationTimestamp;
+import java.util.Date;
+
 
 @Entity
 @Table(name = "tarefas")
@@ -36,9 +36,8 @@ public class Tarefa {
     @Column(name = "tarefa_preferencia_tempo")
     private Time tarefaPreferenciaTempo;
 
-    @CreationTimestamp
-    @Column(name = "tarefa_criacao_at", updatable = false)
-    private Timestamp tarefaCriacaoAt;
+    @Column(name = "tarefa_data_conclusao")
+    private Date tarefaDataConclusao;
 
     @Column(name = "tarefa_completada")
     private boolean tarefaCompletada;

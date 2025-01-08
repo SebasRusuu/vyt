@@ -11,14 +11,27 @@
     justify-content: space-between;
 }
 
+.task-header {
+    display: flex;
+    justify-content: space-between; /* Distribui o espaço entre os itens */
+    align-items: center; /* Alinha verticalmente os itens ao centro */
+    margin-bottom: 8px; /* Espaçamento entre o cabeçalho e o restante */
+}
+
 .task-title {
     font-size: 1.25rem; /* Tamanho do título */
     font-weight: bold;
     color: #333;
-    margin-bottom: 8px;
-    word-wrap: break-word; /* Garante quebra de linha */
-    white-space: normal; /* Permite quebra de linha */
-    display: block; /* Garante visibilidade */
+    margin: 0; /* Remove margens extras */
+    flex: 1; /* Faz o título ocupar o espaço disponível */
+}
+
+.task-important {
+    font-size: 0.9rem; /* Tamanho do texto da prioridade */
+    font-weight: bold; /* Deixa a prioridade em negrito */
+    text-transform: capitalize; /* Transforma o texto para começar com maiúscula */
+    margin: 0; /* Remove margens extras */
+    padding-left: 8px; /* Adiciona um espaçamento entre o título e a prioridade */
 }
 
 .task-description {
@@ -41,11 +54,7 @@
     color: #888;
 }
 
-.task-important {
-    font-size: 0.9rem;
-    font-weight: bold;
-    text-transform: capitalize;
-}
+
 
 .low-important {
     color: green;

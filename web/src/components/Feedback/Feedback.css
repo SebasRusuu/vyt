@@ -1,0 +1,86 @@
+.feedback-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 300px;
+    text-align: center;
+    z-index: 1000;
+}
+
+.feedback-popup h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.feedback-popup .rating {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.feedback-popup .rating button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e0e0e0; /* Cor padrão */
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease, color 0.3s ease;
+    color: black; /* Cor do texto padrão */
+}
+
+/* Hover para cada nível de feedback */
+.feedback-popup .rating button:nth-child(1):hover {
+    background: #ff0000; /* Vermelho */
+    color: white;
+}
+
+.feedback-popup .rating button:nth-child(2):hover {
+    background: #ff7f00; /* Laranja */
+    color: white;
+}
+
+.feedback-popup .rating button:nth-child(3):hover {
+    background: #ffff00; /* Amarelo */
+    color: black; /* Contraste no amarelo */
+}
+
+.feedback-popup .rating button:nth-child(4):hover {
+    background: #90ee90; /* Verde claro */
+    color: black;
+}
+
+.feedback-popup .rating button:nth-child(5):hover {
+    background: #4caf50; /* Verde padrão */
+    color: white;
+}
+
+/* Estado ativo (apenas ao clicar) */
+.feedback-popup .rating button.active {
+    background: #3aafae; /* Cor para estado ativo */
+    color: white;
+}
+
+/* Botão de envio */
+.feedback-popup button.submit {
+    background: #3aafae;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.feedback-popup button.submit:hover {
+    background: #3a8f8e;
+}
