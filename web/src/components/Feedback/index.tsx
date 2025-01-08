@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Feedback.css";
-import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../services/api";
 
 interface FeedbackProps {
     isOpen: boolean;
@@ -22,7 +22,7 @@ const Feedback: React.FC<FeedbackProps> = ({ isOpen, onClose, tarefaId }) => {
 
         try {
             // Enviar os dados do feedback para o backend
-            await api.post(`/feedback/${tarefaId}`, {
+            await axiosInstance.post(`/feedback/${tarefaId}`, {
                 feedbackValor: rating,
                 feedbackComentario: comment,
             });

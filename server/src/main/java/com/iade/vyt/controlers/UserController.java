@@ -66,6 +66,30 @@ public class UserController {
         }
     }
 
+    @GetMapping("/validate-token")
+    public ResponseEntity<?> validateToken(@RequestParam("token") String token) {
+        try {
+            // Validate the token
+            if (jwtTokenProvider.validateToken(token)) {
+                String email = jwtTokenProvider.getUsernameFromToken(token);
+
+                // Check if the user exists
+                User user = userRepository.findByEmail(email).orElse(null);
+                if (user != null) {
+                    return ResponseEntity.ok(Map.of(
+                            "message", "Token válido.",
+                            "email", email,
+                            "userName", user.getUserName()
+                    ));
+                }
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido.");
+        }
+    }
+
+
 
 
     @GetMapping("/oauth2-success")

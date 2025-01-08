@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
 import ContainerTaskCompleted from "../ContainerTaskCompleted";
 import "../MainLayout/MainLayout.css";
-import api from "../../services/api";
 import { AuthContext } from "../../context/AuthContext";
+import axiosInstance from "../../services/api";
 
 interface Task {
     tarefaId: number;
@@ -27,7 +27,7 @@ const MainLayoutCompleted: React.FC = () => {
 
             try {
                 setLoading(true);
-                const response = await api.get("/tarefa/completed", {
+                const response = await axiosInstance.get("/tarefa/completed", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 

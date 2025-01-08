@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
+
 import "./NewTask.css";
+import axiosInstance from "../../services/api";
 
 interface NewTaskProps {
     isOpen: boolean;
@@ -52,8 +53,8 @@ const NewTask: React.FC<NewTaskProps> = ({ isOpen, onClose }) => {
                 throw new Error("Token não encontrado. Por favor, faça login novamente.");
             }
 
-            await axios.post(
-                "http://localhost:8080/api/tarefa/create",
+            await axiosInstance.post(
+                "/tarefa/create",
                 {
                     tarefaTitulo: taskData.tarefaTitulo,
                     tarefaDescricao: taskData.tarefaDescricao,

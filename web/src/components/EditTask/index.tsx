@@ -1,7 +1,7 @@
 import React, { useState, useEffect , useContext} from "react";
 import "./EditTask.css"; // Estilos específicos do componente
-import api from "../../services/api";
 import { AuthContext } from "../../context/AuthContext";
+import axiosInstance from "../../services/api";
 
 
 interface EditTaskProps {
@@ -34,7 +34,7 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
     useEffect(() => {
         const loadTask = async () => {
             try {
-                const response = await api.get(`/tarefa/id/${taskId}`, {
+                const response = await axiosInstance.get(`/tarefa/id/${taskId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -85,7 +85,7 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
 
 
             // Realizar o pedido PUT para atualizar a tarefa
-            await api.put(
+            await axiosInstance.put(
                 `/tarefa/update/${taskId}`,
                 {
                     tarefaTitulo: formData.tarefaTitulo,

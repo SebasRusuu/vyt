@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
+import axiosInstance from "../services/api";
 
 // Tipo para o token decodificado
 interface DecodedToken {
@@ -37,16 +38,30 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     useEffect(() => {
         const savedToken = localStorage.getItem("token");
         if (savedToken) {
-            try {
-                setToken(savedToken);
-                const decoded: DecodedToken = jwtDecode(savedToken);
-                setUser(decoded.userName); // Atualiza para usar o nome do usuário
-            } catch (error) {
-                console.error("Token inválido:", error);
-                localStorage.removeItem("token");
-            }
+            validateToken(savedToken);
         }
     }, []);
+
+    const validateToken = async (savedToken: string) => {
+        try {
+            // Validate the token with the backend
+            const response = await axiosInstance.get(`/auth/validate-token`, {
+                params: { token: savedToken },
+            });
+
+            if (response.status === 200) {
+                // If valid, decode and set the user
+                const decoded: DecodedToken = jwtDecode(savedToken);
+                setToken(savedToken);
+                setUser(decoded.userName); // Atualiza para usar o nome do usuário
+            }
+        } catch (error) {
+            console.error("Token inválido ou expirado:", error);
+            localStorage.removeItem("token");
+            setToken(null);
+            setUser(null);
+        }
+    };
 
     const login = (token: string) => {
         try {

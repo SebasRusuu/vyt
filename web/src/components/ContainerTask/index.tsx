@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import './ContainerTask.css';
 import { FaTrashAlt, FaCheck } from 'react-icons/fa';
 import EditTask from '../EditTask';
-import api from '../../services/api';
+import axiosInstance from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import Feedback from '../Feedback';
 
@@ -45,7 +45,7 @@ const formatConclusaoAt = (dataConclusao: string | undefined): JSX.Element => {
 const markTaskAsCompleted = async (taskId: number, token: string): Promise<void> => {
     console.log('Tentando marcar tarefa como completa:', taskId);
     try {
-        const response = await api.put(`/tarefa/complete/${taskId}`, {}, {
+        const response = await axiosInstance.put(`/tarefa/complete/${taskId}`, {}, {
             headers: { Authorization: `Bearer ${token}` },
         });
         console.log('Resposta da API ao completar tarefa:', response.status);
@@ -57,7 +57,7 @@ const markTaskAsCompleted = async (taskId: number, token: string): Promise<void>
 const deleteTask = async (taskId: number, token: string) => {
     console.log('Tentando excluir tarefa:', taskId);
     try {
-        const response = await api.delete(`/tarefa/delete/${taskId}`, {
+        const response = await axiosInstance.delete(`/tarefa/delete/${taskId}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         console.log('Resposta da API ao excluir tarefa:', response.status);
@@ -102,7 +102,7 @@ const ContainerTask: React.FC<TaskProps> = ({
         if (rating !== null) {
             try {
                 // Enviar feedback ao backend
-                await api.post(`/feedback/${taskId}`, {
+                await axiosInstance.post(`/feedback/${taskId}`, {
                     feedbackValor: rating,
                     feedbackComentario: comment,
                 });

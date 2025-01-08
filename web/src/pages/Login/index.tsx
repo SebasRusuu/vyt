@@ -6,6 +6,7 @@ import teste from '../../assets/teste6.png';
 import './login.css';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
+import axiosInstance from "../../services/api";
 
 const Login: React.FC = () => {
     const { login } = useContext(AuthContext); // Usando o AuthContext
@@ -17,7 +18,7 @@ const Login: React.FC = () => {
     const handleLogin = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8080/api/auth/login', {
+            const response = await axiosInstance.post('/auth/login', {
                 email,
                 password,
             });
@@ -33,8 +34,15 @@ const Login: React.FC = () => {
         }
     };
 
-    const handleGoogleLogin = () => {
-        window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    const handleGoogleLogin = async () => {
+        try {
+            // Tenta o backend principal
+            await axios.get("http://localhost:8080/healthcheck");
+            window.location.href = "http://localhost:8080/oauth2/authorization/google";
+        } catch (error) {
+            console.warn("Backend principal indisponível, redirecionando para secundário");
+            window.location.href = "http://localhost:8081/oauth2/authorization/google";
+        }
     };
 
     const handleRegisterClick = () => navigate('/register');
