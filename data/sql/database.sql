@@ -13,7 +13,7 @@ CREATE TABLE if not exists tarefas(
     tarefa_descricao VARCHAR(255),
     tarefa_importancia_prioridade VARCHAR(20),
     tarefa_preferencia_tempo time,
-    tarefa_criacao_at timestamp,
+    tarefa_data_conclusao date,
     tarefa_completada boolean,
     FOREIGN KEY (tarefa_user_id) REFERENCES uservyt(user_id)
     );

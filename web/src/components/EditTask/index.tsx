@@ -16,6 +16,7 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
         tarefaImportancia: "",
         tarefaPrioridade: "",
         tarefaPreferenciaTempo: "",
+        tarefaDataConclusao: "",
     });
     const [error, setError] = useState<string | null>(null);
     const { token } = useContext(AuthContext);
@@ -38,12 +39,20 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
                 });
 
                 const task = response.data;
+
+                // Converte o formato de data para "yyyy-MM-dd"
+                const formatDate = (dateString: string): string => {
+                    const date = new Date(dateString);
+                    return date.toISOString().split("T")[0]; // Pega apenas a parte da data
+                };
+
                 setFormData({
                     tarefaTitulo: task.tarefaTitulo,
                     tarefaDescricao: task.tarefaDescricao,
                     tarefaImportancia: task.tarefaImportancia,
                     tarefaPrioridade: task.tarefaPrioridade,
                     tarefaPreferenciaTempo: task.tarefaPreferenciaTempo,
+                    tarefaDataConclusao: formatDate(task.tarefaDataConclusao),
                 });
             } catch (err: any) {
                 console.error("Erro ao carregar tarefa:", err.message);
@@ -52,7 +61,8 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
         };
 
         loadTask();
-    }, [taskId]);
+    }, [taskId, token]);
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -73,6 +83,7 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
                 importanciaPrioridade = "Médio";
             }
 
+
             // Realizar o pedido PUT para atualizar a tarefa
             await api.put(
                 `/tarefa/update/${taskId}`,
@@ -81,6 +92,7 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
                     tarefaDescricao: formData.tarefaDescricao,
                     tarefaImportanciaPrioridade: importanciaPrioridade,
                     tarefaPreferenciaTempo: formData.tarefaPreferenciaTempo,
+                    tarefaDataConclusao: formData.tarefaDataConclusao,
                 },
                 {
                     headers: {
@@ -160,6 +172,16 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
                         </select>
                     </div>
                     <div className="edit-task-field">
+                        <label htmlFor="tarefaDataConclusao">Data de Conclusão</label>
+                        <input
+                            type="date"
+                            id="tarefaDataConclusao"
+                            name="tarefaDataConclusao"
+                            value={formData.tarefaDataConclusao}
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div className="edit-task-field">
                         <label htmlFor="tarefaPreferenciaTempo">Duração</label>
                         <select
                             id="tarefaPreferenciaTempo"
@@ -175,7 +197,7 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
                     </div>
                     <button type="submit" className="edit-task-submit-btn">
                         Salvar Alterações
-                        
+
                     </button>
                 </form>
             </div>
