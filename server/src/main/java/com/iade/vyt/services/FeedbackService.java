@@ -12,16 +12,24 @@ import org.springframework.http.HttpStatus;
 @Service
 public class FeedbackService {
 
-    @Autowired
-    private FeedbackRepository feedbackRepository;
+    private final FeedbackRepository feedbackRepository;
+    private final TarefaRepository tarefaRepository;
 
-    @Autowired
-    private TarefaRepository tarefaRepository;
+    public FeedbackService(FeedbackRepository feedbackRepository, TarefaRepository tarefaRepository) {
+        this.feedbackRepository = feedbackRepository;
+        this.tarefaRepository = tarefaRepository;
+    }
 
     public Feedback createFeedback(int tarefaId, int feedbackValor, String feedbackComentario) {
+        // Buscar a tarefa pelo ID
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada"));
 
+        // Atualizar o valor de feedback na tarefa
+        tarefa.setFeedbackValor(feedbackValor);
+        tarefaRepository.save(tarefa); // Salvar a tarefa atualizada no banco de dados
+
+        // Criar e salvar o feedback
         Feedback feedback = new Feedback();
         feedback.setFeedbackTarefa(tarefa);
         feedback.setFeedbackValor(feedbackValor);
@@ -29,6 +37,7 @@ public class FeedbackService {
 
         return feedbackRepository.save(feedback);
     }
+
 
     public Feedback getFeedbackById(int feedbackId) {
         return feedbackRepository.findById(feedbackId)

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class CalendarioService {
@@ -19,6 +21,7 @@ public class CalendarioService {
     private final TarefaService tarefaService;
     private final UserRepository userRepository;
     private final IAService iaService;
+    private final Map<Integer, Boolean> userScheduleLocks = new ConcurrentHashMap<>();
 
     public CalendarioService(CalendarioRepository calendarioRepository,
                              TarefaService tarefaService,
@@ -30,50 +33,95 @@ public class CalendarioService {
         this.iaService = iaService;
     }
 
-    // Métod0 atualizado para verificar se há novas tarefas antes de gerar o calendário
     public void generateSchedule(int userId) {
-        var user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
-
-        // Passo 1: Buscar tarefas incompletas
-        List<Tarefa> tarefasIncompletas = tarefaService.getIncompleteTarefasByUserId(userId);
-
-        // Verificar se já existe um calendário para essas tarefas
-        boolean hasNewTasks = tarefasIncompletas.stream()
-                .anyMatch(tarefa -> calendarioRepository.findByUserUserId(userId).stream()
-                        .noneMatch(calendario -> calendario.getTarefa().getTarefaId() == tarefa.getTarefaId()));
-
-        if (!hasNewTasks) {
-            System.out.println("[INFO] Nenhuma nova tarefa encontrada. Calendário não será gerado.");
-            return; // Não gera um novo calendário
+        // Evitar múltiplas gerações de calendário simultâneas para o mesmo usuário
+        if (userScheduleLocks.putIfAbsent(userId, true) != null) {
+            System.out.println("[INFO] Geração de calendário já em andamento para userId: " + userId);
+            return; // Outra requisição já está sendo processada
         }
 
-        System.out.println("[INFO] Novas tarefas encontradas. Gerando calendário...");
+        try {
+            var user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
 
-        // Passo 2: Chamar a IA para gerar o calendário
-        ScheduleResponse scheduleResponse = iaService.generateSchedule(tarefasIncompletas);
+            // Passo 1: Buscar tarefas incompletas
+            List<Tarefa> tarefasIncompletas = tarefaService.getIncompleteTarefasByUserId(userId);
 
-        // Passo 3: Salvar o calendário no banco de dados
-        for (ScheduleTask task : scheduleResponse.getTasks()) {
-            Calendario calendario = new Calendario();
-            calendario.setUser(user);
+            // Verificar se já existe um calendário para essas tarefas
+            boolean hasNewTasks = tarefasIncompletas.stream()
+                    .anyMatch(tarefa -> calendarioRepository.findByUserUserId(userId).stream()
+                            .noneMatch(calendario -> calendario.getTarefa().getTarefaId() == tarefa.getTarefaId()));
 
-            Tarefa tarefa = tarefaService.getTarefaById(task.getId());
-            calendario.setTarefa(tarefa);
+            if (!hasNewTasks) {
+                System.out.println("[INFO] Nenhuma nova tarefa encontrada. Calendário não será gerado.");
+                return; // Não gera um novo calendário
+            }
 
-            calendario.setData(Date.valueOf(task.getDate()));
-            calendario.setHoraInicio(Time.valueOf(task.getHoraInicio()));
-            calendario.setHoraFim(Time.valueOf(task.getHoraFim()));
+            System.out.println("[INFO] Novas tarefas encontradas. Gerando calendário...");
 
-            calendarioRepository.save(calendario);
+            // Passo 2: Chamar a IA para gerar o calendário
+            ScheduleResponse scheduleResponse = iaService.generateSchedule(tarefasIncompletas);
+
+            // Passo 3: Salvar o calendário no banco de dados
+            for (ScheduleTask task : scheduleResponse.getTasks()) {
+                Calendario calendario = new Calendario();
+                calendario.setUser(user);
+
+                Tarefa tarefa = tarefaService.getTarefaById(task.getId());
+                calendario.setTarefa(tarefa);
+
+                calendario.setData(Date.valueOf(task.getDate()));
+                calendario.setHoraInicio(Time.valueOf(task.getHoraInicio()));
+                calendario.setHoraFim(Time.valueOf(task.getHoraFim()));
+
+                calendarioRepository.save(calendario);
+            }
+
+            System.out.println("[INFO] Calendário gerado e salvo com sucesso!");
+        } finally {
+            userScheduleLocks.remove(userId); // Liberar o bloqueio após o processamento
         }
-
-        System.out.println("[INFO] Calendário gerado e salvo com sucesso!");
     }
+
+
 
     public List<Calendario> getUserSchedule(int userId) {
-        // Caso o calendário não exista, retorna uma lista vazia
-        return calendarioRepository.findByUserUserId(userId);
+        // Buscar todas as entradas no calendário associadas ao usuário
+        List<Calendario> allSchedules = calendarioRepository.findByUserUserId(userId);
+
+        // Logs detalhados para depuração
+        System.out.println("[DEBUG] Todas as entradas do calendário para o usuário: " + allSchedules);
+
+        // Filtrar tarefas incompletas (tarefaCompletada = false)
+        List<Calendario> filteredSchedules = allSchedules.stream()
+                .filter(calendario -> !calendario.getTarefa().isTarefaCompletada())
+                .toList();
+
+        System.out.println("[DEBUG] Entradas filtradas (tarefas incompletas): " + filteredSchedules);
+
+        return filteredSchedules;
     }
+
+
+
+    public void sendCompletedTasksToIA(int userId) {
+        List<Tarefa> completedTasks = tarefaService.getCompleteTarefasByUserId(userId);
+
+        // Filtrar apenas as tarefas com feedback válido
+        List<Tarefa> tasksWithFeedback = completedTasks.stream()
+                .filter(tarefa -> tarefa.getFeedbackValor() != null) // Certificar que o feedback não é nulo
+                .toList();
+
+        if (!tasksWithFeedback.isEmpty()) {
+            System.out.println("[INFO] Enviando tarefas completadas com feedback para a IA...");
+            iaService.trainModel(tasksWithFeedback); // Treinar a IA com tarefas que possuem feedback associado
+        } else {
+            System.out.println("[INFO] Nenhuma tarefa com feedback encontrada para treinamento.");
+        }
+    }
+
+
+
+
 }
 

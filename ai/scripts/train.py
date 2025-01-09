@@ -10,6 +10,9 @@ def convert_time_to_hours(duration_str):
     time_parts = list(map(int, duration_str.split(":")))
     return time_parts[0] + time_parts[1] / 60 + time_parts[2] / 3600
 
+def clean_date(date_str):
+    """Remove qualquer tempo adicional da data"""
+    return date_str.split(" ")[0]  # Retorna apenas a parte da data
 
 def encode_category(category):
     """Codifica categorias como números."""
@@ -17,35 +20,45 @@ def encode_category(category):
         "Trabalho": 1, "Lazer": 2, "Saúde": 3, "Estudos": 4, "Casa": 5,
         "Social": 6, "Financeiro": 7, "Desenvolvimento Pessoal": 8, "Viagens": 9, "Recados": 10
     }
-    return categories.get(category, 0)  # Default: 0 para categorias desconhecidas
+    return categories.get(category, 0)  # Default: 0 para desconhecidas
 
 def encode_phase_of_day(phase):
     """Codifica as fases do dia (manhã, tarde, noite)."""
     phases = {"Manhã": 1, "Tarde": 2, "Noite": 3}
-    return phases.get(phase, 0)  # Default: 0 para fases desconhecidas
+    return phases.get(phase, 0)  # Default: 0
 
 def train_model(completed_tasks):
     """Treina o modelo com base nas tarefas completadas."""
+    print("[DEBUG] Tarefas completadas recebidas para treinamento:", completed_tasks)
+
+    required_fields = [
+        "tarefaTitulo", "tarefaDuracao", "tarefaDataConclusao", "tarefaPrioridade",
+        "feedbackValor", "tarefaCategoria", "tarefaFaseDoDia", "tarefaCompletada"
+    ]
+    for task in completed_tasks:
+        for field in required_fields:
+            if field not in task:
+                raise KeyError(f"Campo '{field}' ausente na tarefa: {task}")
+
     X = np.array([
         [
             float(convert_time_to_hours(t["tarefaDuracao"])),  # Duração
             encode_category(t["tarefaCategoria"]),            # Categoria
             encode_phase_of_day(t["tarefaFaseDoDia"]),        # Fase do dia
             t.get("tarefaPrioridade", 1),                     # Prioridade
-            (datetime.strptime(t["tarefaDataConclusao"], "%Y-%m-%d") - datetime.now()).days,  # Dias até o prazo
-            1 if t["tarefaCompletada"] else 0                 # Codificar tarefaCompletada como 1 ou 0
+            (datetime.strptime(clean_date(t["tarefaDataConclusao"]), "%Y-%m-%d") - datetime.now()).days,  # Dias até prazo
+            1 if t["tarefaCompletada"] else 0                 # Completada (0 ou 1)
         ]
         for t in completed_tasks
     ])
-    y = np.array([t["feedbackValor"] for t in completed_tasks])  # Feedback
+    y = np.array([t["feedbackValor"] for t in completed_tasks])
 
     model = LinearRegression()
     model.fit(X, y)
 
     with open("models/trained_model.pkl", "wb") as file:
         pickle.dump(model, file)
-    print("Modelo treinado e guardado com sucesso!")
-
+    print("[INFO] Modelo treinado e salvo com sucesso.")
 
 
 def predict_task_schedule(task, model):
@@ -53,7 +66,6 @@ def predict_task_schedule(task, model):
     Prevê o feedback esperado para uma tarefa com base no modelo treinado.
     """
     try:
-        # Validar e converter os parâmetros da tarefa
         duration = float(convert_time_to_hours(task.get("tarefaDuracao", "00:00:00")))
         category = encode_category(task.get("tarefaCategoria", ""))
         phase_of_day = encode_phase_of_day(task.get("tarefaFaseDoDia", ""))
@@ -63,18 +75,17 @@ def predict_task_schedule(task, model):
             if "tarefaDataConclusao" in task
             else 0
         )
-        tarefa_completada = 1 if task.get("tarefaCompletada", False) else 0  # Codificar como 1 ou 0
+        tarefa_completada = 1 if task.get("tarefaCompletada", False) else 0
 
-        # Criar os dados para previsão com 6 features (agora inclui tarefaCompletada)
         X_new = np.array([[duration, category, phase_of_day, priority, days_to_deadline, tarefa_completada]])
-
-        # Realizar a previsão com o modelo treinado
         predicted_feedback = model.predict(X_new)
         return predicted_feedback[0]
+
     except Exception as e:
         print(f"[ERROR] Previsão falhou para a tarefa: {task}")
         print(f"[DETAILS] {e}")
-        return -1  # Valor padrão em caso de falha
+        return -1  # fallback
+
 
 
 

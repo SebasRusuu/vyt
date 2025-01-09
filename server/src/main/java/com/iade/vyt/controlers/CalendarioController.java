@@ -51,7 +51,7 @@ public class CalendarioController {
         }
 
         try {
-            List<Calendario> schedule = calendarioService.getUserSchedule(userId);
+            List<Calendario> schedule = calendarioService.getUserSchedule(userId); // Já retorna filtrado
             System.out.println("[INFO] Retornando calendário para userId: " + userId);
             return ResponseEntity.ok(schedule);
         } catch (Exception e) {
@@ -59,6 +59,7 @@ public class CalendarioController {
             return new ResponseEntity<>("Erro ao buscar o calendário: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
 }

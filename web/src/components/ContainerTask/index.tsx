@@ -6,6 +6,7 @@ import axiosInstance from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import Feedback from '../Feedback';
 
+
 interface TaskProps {
     taskId: number;
     title: string;
@@ -53,9 +54,9 @@ const markTaskAsCompleted = async (taskId: number, token: string): Promise<void>
         const response = await axiosInstance.put(`/tarefa/complete/${taskId}`, {}, {
             headers: { Authorization: `Bearer ${token}` },
         });
-        console.log('Resposta da API ao completar tarefa:', response.status);
+        console.log('Resposta da API ao completar tarefa:', response.status, response.data);
     } catch (error: any) {
-        console.error('Erro ao marcar a tarefa como completada:', error);
+        console.error('Erro ao marcar a tarefa como completada:', error.response?.data || error.message);
     }
 };
 
@@ -83,6 +84,7 @@ const ContainerTask: React.FC<TaskProps> = ({
     const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
+
     const handleClosePopup = () => {
         setIsEditPopupOpen(false);
     };
@@ -96,28 +98,12 @@ const ContainerTask: React.FC<TaskProps> = ({
 
         try {
             await markTaskAsCompleted(taskId, token);
+            setIsFeedbackOpen(true);
         } catch (error) {
             console.error('Erro ao marcar a tarefa como completada:', error);
-        } finally {
-            setIsFeedbackOpen(true);
         }
     };
 
-    const handleFeedbackClose = async (rating: number | null, comment: string) => {
-        if (rating !== null) {
-            try {
-                // Enviar feedback ao backend
-                await axiosInstance.post(`/feedback/${taskId}`, {
-                    feedbackValor: rating,
-                    feedbackComentario: comment,
-                });
-                console.log(`Feedback para a tarefa ${taskId}: ${rating}/10, comentário: "${comment}"`);
-            } catch (error) {
-                console.error('Erro ao salvar feedback:', error);
-            }
-        }
-        setIsFeedbackOpen(false); // Fecha o pop-up de Feedback
-    };
 
     return (
         <>

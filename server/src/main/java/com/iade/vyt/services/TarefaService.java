@@ -1,6 +1,7 @@
 // TarefaService.java
 package com.iade.vyt.services;
 
+import com.iade.vyt.models.Feedback;
 import com.iade.vyt.models.User;
 import com.iade.vyt.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,12 @@ public class TarefaService {
 
     private final TarefaRepository tarefaRepository;
     private final UserRepository userRepository;
+    private final FeedbackService feedbackService;
 
-    public TarefaService(TarefaRepository tarefaRepository, UserRepository userRepository) {
+    public TarefaService(TarefaRepository tarefaRepository, UserRepository userRepository, FeedbackService feedbackService) {
         this.tarefaRepository = tarefaRepository;
         this.userRepository = userRepository;
+        this.feedbackService = feedbackService;
     }
 
     public void associateTarefaWithUser(Tarefa tarefa, int userId) {
@@ -38,11 +41,20 @@ public class TarefaService {
     }
 
     public void markAsCompleted(int tarefaId) {
+        System.out.println("[DEBUG] Marcando tarefa como completada. ID: " + tarefaId);
+
+        // Buscar a tarefa pelo ID
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada."));
+        System.out.println("[DEBUG] Tarefa encontrada: " + tarefa);
+
+        // Atualizar o status para completada
         tarefa.setTarefaCompletada(true);
         tarefaRepository.save(tarefa);
+
+        System.out.println("[DEBUG] Tarefa marcada como completada com sucesso. ID: " + tarefaId);
     }
+
 
     public void deleteTarefa(int tarefaId) {
         Tarefa tarefa = tarefaRepository.findById(tarefaId)

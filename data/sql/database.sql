@@ -17,6 +17,7 @@ CREATE TABLE if not exists tarefas(
     tarefa_categoria VARCHAR(30),
     tarefa_fasedodia VARCHAR(30),
     tarefa_completada boolean,
+    feedback_valor int,
     FOREIGN KEY (tarefa_user_id) REFERENCES uservyt(user_id)
     );
 

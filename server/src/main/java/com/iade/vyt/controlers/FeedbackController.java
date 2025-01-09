@@ -2,9 +2,12 @@ package com.iade.vyt.controlers;
 
 import com.iade.vyt.models.Feedback;
 import com.iade.vyt.services.FeedbackService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.iade.vyt.services.CalendarioService;
 
 import java.util.Map;
 
@@ -13,21 +16,36 @@ import java.util.Map;
 public class FeedbackController {
 
     @Autowired
-    private FeedbackService feedbackService;
+    private final FeedbackService feedbackService;
+    private final CalendarioService calendarioService; // Adicionar o CalendarioService
+
+    public FeedbackController(FeedbackService feedbackService, CalendarioService calendarioService) {
+        this.feedbackService = feedbackService;
+        this.calendarioService = calendarioService; // Injetar corretamente
+    }
 
     @PostMapping("/{tarefaId}")
     public ResponseEntity<Feedback> createFeedback(
             @PathVariable int tarefaId,
-            @RequestBody Map<String, Object> feedbackData) { // Atualizado para receber o corpo como JSON
+            @RequestBody Map<String, Object> feedbackData,
+            HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("user_id");
 
-        // Extração dos dados do corpo da requisição
+        if (userId == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         int feedbackValor = (int) feedbackData.get("feedbackValor");
         String feedbackComentario = (String) feedbackData.get("feedbackComentario");
 
-        // Criação do feedback
         Feedback feedback = feedbackService.createFeedback(tarefaId, feedbackValor, feedbackComentario);
-        return ResponseEntity.status(201).body(feedback);
+
+        // Enviar tarefas completadas para a IA
+        calendarioService.sendCompletedTasksToIA(userId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(feedback);
     }
+
 
     @GetMapping("/id/{feedbackId}")
     public ResponseEntity<Feedback> getFeedbackById(@PathVariable int feedbackId) {

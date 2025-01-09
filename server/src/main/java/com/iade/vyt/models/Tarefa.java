@@ -47,6 +47,9 @@ public class Tarefa {
     @Column(name = "tarefa_completada")
     private boolean tarefaCompletada;
 
+    @Column(name = "feedback_valor")
+    private Integer feedbackValor;
+
     @Override
     public String toString() {
         return "Tarefa{" +
