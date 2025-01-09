@@ -2,7 +2,7 @@
 
 ---
 
-**VyT** _(Value you Time)_ é um gerênciador de tarefas inteligente desenvolvido em ambito universitário
+**VyT** _(Value you Time)_ é um gestor de tarefas inteligente desenvolvido em ambito universitário
 [IADE](https://www.iade.europeia.pt/) com o intuito de gerir as tarefas, onde organiza e prioriza as tarefas de acordo
 com a sua importância e urgência, utilizando a [_**Matriz de matriz de Covey**_](#matriz).
 
