@@ -10,6 +10,18 @@ x-postgres-common:
     retries: 5
 
 services:
+  ai_service:
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+    container_name: ai_service
+    ports:
+      - "5001:5001"
+    networks:
+      - app_net
+
+
+
   postgres_primary:
     <<: *postgres-common
     build:

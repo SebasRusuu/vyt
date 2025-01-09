@@ -89,3 +89,54 @@ button {
 .submit-button:hover {
   background-color: #3a8f8e;
 }
+
+
+.rating {
+  display: flex;
+  justify-content: center;
+  gap: 12px; /* Aumenta o espaçamento entre botões */
+  margin-bottom: 20px;
+}
+
+.rating button {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: black;
+  transition: background 0.3s ease, transform 0.2s;
+}
+
+/* Hover para cada nível de feedback */
+.rating button:nth-child(1):hover {
+  background: #ff0000; /* Vermelho */
+  color: white;
+}
+
+.rating button:nth-child(2):hover {
+  background: #ff5722; /* Laranja */
+  color: white;
+}
+
+.rating button:nth-child(3):hover {
+  background: #ff9800; /* Laranja claro */
+  color: white;
+}
+
+.rating button:nth-child(4):hover {
+  background: #ffc107; /* Amarelo */
+  color: white;
+}
+
+.rating button:nth-child(5):hover {
+  background: #ffeb3b; /* Amarelo claro */
+  color: black;
+}
+
+.rating button.active {
+  background: #3aafae; /* Cor para estado ativo */
+  color: white;
+}

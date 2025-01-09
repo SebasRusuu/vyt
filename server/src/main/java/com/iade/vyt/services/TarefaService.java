@@ -1,3 +1,4 @@
+// TarefaService.java
 package com.iade.vyt.services;
 
 import com.iade.vyt.models.User;
@@ -10,7 +11,6 @@ import com.iade.vyt.models.Tarefa;
 import com.iade.vyt.repositories.TarefaRepository;
 
 import java.util.List;
-
 
 @Service
 public class TarefaService {
@@ -38,25 +38,20 @@ public class TarefaService {
     }
 
     public void markAsCompleted(int tarefaId) {
-        System.out.println("Buscando tarefa com ID: " + tarefaId);
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada."));
         tarefa.setTarefaCompletada(true);
         tarefaRepository.save(tarefa);
-        System.out.println("Tarefa marcada como completada no banco de dados: " + tarefaId);
     }
 
-
     public void deleteTarefa(int tarefaId) {
-        System.out.println("Tentando excluir tarefa com ID: " + tarefaId);
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada."));
         tarefaRepository.delete(tarefa);
-        System.out.println("Tarefa excluída do banco de dados: " + tarefaId);
     }
 
-
     public Tarefa createTarefa(Tarefa tarefa) {
+        System.out.println("Salvando no banco de dados: " + tarefa);
         return tarefaRepository.save(tarefa);
     }
 
@@ -65,9 +60,12 @@ public class TarefaService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada."));
         tarefaToUpdate.setTarefaTitulo(tarefa.getTarefaTitulo());
         tarefaToUpdate.setTarefaDescricao(tarefa.getTarefaDescricao());
-        tarefaToUpdate.setTarefaImportanciaPrioridade(tarefa.getTarefaImportanciaPrioridade());
-        tarefaToUpdate.setTarefaPreferenciaTempo(tarefa.getTarefaPreferenciaTempo());
-        tarefaToUpdate.setTarefaDataConclusao(tarefa.getTarefaDataConclusao()); // Atualiza a data de conclusão
+        tarefaToUpdate.setTarefaPrioridade(tarefa.getTarefaPrioridade());
+        tarefaToUpdate.setTarefaDuracao(tarefa.getTarefaDuracao());
+        tarefaToUpdate.setTarefaDataConclusao(tarefa.getTarefaDataConclusao());
+        tarefaToUpdate.setTarefaCategoria(tarefa.getTarefaCategoria());
+        tarefaToUpdate.setTarefaFaseDoDia(tarefa.getTarefaFaseDoDia());
+        tarefaToUpdate.setTarefaCompletada(tarefa.isTarefaCompletada());
         return tarefaRepository.save(tarefaToUpdate);
     }
 

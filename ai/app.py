@@ -6,7 +6,7 @@ from scripts.schedule import generate_schedule
 app = Flask(__name__)
 
 # Carregar o modelo treinado
-MODEL_PATH = "ai/models/trained_model.pkl"
+MODEL_PATH = "models/trained_model.pkl"
 
 try:
     with open(MODEL_PATH, "rb") as file:

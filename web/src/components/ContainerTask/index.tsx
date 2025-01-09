@@ -11,22 +11,27 @@ interface TaskProps {
     title: string;
     description: string;
     conclusionDate: string;
-    importanciaPrioridade: string;
+    Prioridade: number;
 }
 
-const getImportantLabel = (importanciaPrioridade: string) => importanciaPrioridade;
-
-const getImportantColor = (importanciaPrioridade: string) => {
-    switch (importanciaPrioridade) {
-        case 'Alto':
-            return 'high-important';
-        case 'Médio':
-            return 'medium-important';
-        case 'Baixo':
-            return 'low-important';
-        default:
-            return 'default-important';
+const getImportantLabel = (Prioridade: number) => {
+    if (Prioridade === 1 || Prioridade === 2) {
+        return 'Baixo';
     }
+    if (Prioridade === 3) {
+        return 'Médio';
+    }
+    return 'Alto';
+};
+
+const getImportantColor = (Prioridade: number) => {
+    if (Prioridade === 1 || Prioridade === 2) {
+        return 'Baixo';
+    }
+    if (Prioridade === 3) {
+        return 'Médio';
+    }
+    return 'Alto';
 };
 
 const formatConclusaoAt = (dataConclusao: string | undefined): JSX.Element => {
@@ -72,7 +77,7 @@ const ContainerTask: React.FC<TaskProps> = ({
                                                 title,
                                                 description,
                                                 conclusionDate,
-                                                importanciaPrioridade,
+                                                Prioridade,
                                             }) => {
     const { token } = useContext(AuthContext); // Obtém o token do contexto
     const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
@@ -120,9 +125,9 @@ const ContainerTask: React.FC<TaskProps> = ({
                 <div className="task-header">
                     <h4 className="task-title">{title}</h4>
                     <p
-                        className={`task-important ${getImportantColor(importanciaPrioridade)}`}
+                        className={`task-important ${getImportantColor(Prioridade)}`}
                     >
-                        {getImportantLabel(importanciaPrioridade)}
+                        {getImportantLabel(Prioridade)}
                     </p>
                 </div>
                 <p className="task-description">{description}</p>

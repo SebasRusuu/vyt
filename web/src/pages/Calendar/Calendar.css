@@ -1,0 +1,22 @@
+.calendar-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.schedule {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.schedule-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.error {
+    color: red;
+    font-weight: bold;
+}

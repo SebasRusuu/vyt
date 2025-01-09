@@ -9,7 +9,17 @@ interface Task {
     tarefaTitulo: string;
     tarefaDescricao: string;
     tarefaDataConclusao: string;
-    tarefaImportanciaPrioridade: string;
+    tarefaPrioridade: number;
+}
+
+const setPrioridadeString = (Prioridade: number) => {
+    if (Prioridade === 1 || Prioridade === 2) {
+        return "Baixo";
+    }
+    if (Prioridade === 3) {
+        return "Médio";
+    }
+    return "Alto";
 }
 
 const MainLayoutCompleted: React.FC = () => {
@@ -71,7 +81,7 @@ const MainLayoutCompleted: React.FC = () => {
                             title={task.tarefaTitulo}
                             description={task.tarefaDescricao}
                             conclusionDate={task.tarefaDataConclusao}
-                            importanciaPrioridade={task.tarefaImportanciaPrioridade}
+                            Prioridade={task.tarefaPrioridade}
                         />
                     ))
                 )}

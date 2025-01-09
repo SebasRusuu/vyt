@@ -10,7 +10,17 @@ interface Task {
     tarefaTitulo: string;
     tarefaDescricao: string;
     tarefaDataConclusao: string;
-    tarefaImportanciaPrioridade: string;
+    tarefaPrioridade: number;
+}
+
+const setPrioridadeString = (Prioridade: number) => {
+    if (Prioridade === 1 || Prioridade === 2) {
+        return "Baixo";
+    }
+    if (Prioridade === 3) {
+        return "Médio";
+    }
+    return "Alto";
 }
 
 const MainLayout: React.FC = () => {
@@ -59,7 +69,7 @@ const MainLayout: React.FC = () => {
             setFilteredTasks(tasks);
         } else {
             setFilteredTasks(
-                tasks.filter((task) => task.tarefaImportanciaPrioridade === filter)
+                tasks.filter((task) => setPrioridadeString(task.tarefaPrioridade) === filter)
             );
         }
     };
@@ -87,7 +97,7 @@ const MainLayout: React.FC = () => {
                             title={task.tarefaTitulo}
                             description={task.tarefaDescricao}
                             conclusionDate={task.tarefaDataConclusao} // Atualizado para usar a nova coluna
-                            importanciaPrioridade={task.tarefaImportanciaPrioridade}
+                            Prioridade={task.tarefaPrioridade}
                         />
                     ))
                 )}

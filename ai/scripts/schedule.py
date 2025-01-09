@@ -27,14 +27,14 @@ def can_schedule(day, start_slot, duration, phase, task_category, schedule, phas
         return False
     if schedule[day]:
         last_task = schedule[day][-1]
-        if last_task["category"] == task_category:
+        if last_task["tarefaCategoria"] == task_category:
             return False
     return True
 
 def generate_schedule(tasks, model, work_start=8, work_end=22, max_hours_per_day=8):
     """Organiza as tarefas respeitando prioridade, deadline, feedback e fase do dia."""
     start_date = datetime.now().date()
-    end_date = max(datetime.strptime(t["deadline"], "%Y-%m-%d").date() for t in tasks)
+    end_date = max(datetime.strptime(t["tarefaDataConclusao"], "%Y-%m-%d").date() for t in tasks)
     days = [start_date + timedelta(days=i) for i in range((end_date - start_date).days + 1)]
 
     schedule = {day.isoformat(): [] for day in days}
@@ -49,12 +49,12 @@ def generate_schedule(tasks, model, work_start=8, work_end=22, max_hours_per_day
     time_slots = {day.isoformat(): [False] * ((work_end - work_start) * 2) for day in days}
 
     # Ordenar tarefas por prioridade e prazo
-    tasks.sort(key=lambda t: (-t["priority"], datetime.strptime(t["deadline"], "%Y-%m-%d")))
+    tasks.sort(key=lambda t: (-t["tarefaPrioridade"], datetime.strptime(t["tarefaDataConclusao"], "%Y-%m-%d")))
 
     for task in tasks:
-        duration = convert_time_to_hours(task["duration"])
-        phase = task.get("phase_of_day", "Manhã")
-        deadline_date = datetime.strptime(task["deadline"], "%Y-%m-%d").date()
+        duration = convert_time_to_hours(task["tarefaDuracao"])
+        phase = task.get("tarefaFaseDoDia", "Manhã")
+        deadline_date = datetime.strptime(task["tarefaDataConclusao"], "%Y-%m-%d").date()
 
         best_day, best_slot, best_feedback = None, None, float("-inf")
 
@@ -66,9 +66,9 @@ def generate_schedule(tasks, model, work_start=8, work_end=22, max_hours_per_day
 
             start_slot, end_slot = phase_slots[phase]
             for slot in range(start_slot, end_slot):
-                if can_schedule(day_str, slot, duration, phase, task["category"], schedule, phase_slots, hours_per_day, max_hours_per_day, time_slots):
+                if can_schedule(day_str, slot, duration, phase, task["tarefaCategoria"], schedule, phase_slots, hours_per_day, max_hours_per_day, time_slots):
                     temp_task = task.copy()
-                    temp_task["duration"] = duration
+                    temp_task["tarefaDuracao"] = duration
                     predicted_feedback = predict_task_schedule(temp_task, model)
 
                     # Ajustar feedback com penalização por atraso
@@ -81,17 +81,18 @@ def generate_schedule(tasks, model, work_start=8, work_end=22, max_hours_per_day
             start_time = work_start + best_slot / 2
             end_time = start_time + duration
             schedule[best_day].append({
-                "title": task["title"],
+                "tarefaTitulo": task["tarefaTitulo"],
                 "start": format_time(start_time),
                 "end": format_time(end_time),
                 "phase": phase,
-                "category": task["category"]
+                "tarefaCategoria": task["tarefaCategoria"],
+                "tarefaCompletada": task.get("tarefaCompletada", False)  # Adicionado campo tarefaCompletada
             })
             for i in range(best_slot, best_slot + int(duration * 2)):
                 time_slots[best_day][i] = True
             hours_per_day[best_day] += duration
 
-    remaining_tasks = [t for t in tasks if not any(t["title"] in d["title"] for day in schedule.values() for d in day)]
+    remaining_tasks = [t for t in tasks if not any(t["tarefaTitulo"] in d["tarefaTitulo"] for day in schedule.values() for d in day)]
     print("Tarefas não agendadas:", remaining_tasks)
 
     return schedule

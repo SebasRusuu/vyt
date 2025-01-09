@@ -8,10 +8,25 @@ interface TaskDetailsProps {
     tarefaId: number;
 }
 
+const setPrioridadeString = (Prioridade: number) => {
+    if (Prioridade === 1 || Prioridade === 2) {
+        return "Baixo";
+    }
+    if (Prioridade === 3) {
+        return "Médio";
+    }
+    return "Alto";
+}
+
 const TaskDetails: React.FC<TaskDetailsProps> = ({ isOpen, onClose, tarefaId }) => {
     const [taskDetails, setTaskDetails] = useState<any>(null);
     const [feedbackDetails, setFeedbackDetails] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
+
+    const formatDate = (dateString: string): string => {
+        const date = new Date(dateString);
+        return date.toISOString().split("T")[0]; // Pega apenas a parte da data
+    };
 
     useEffect(() => {
         if (!isOpen) return;
@@ -52,8 +67,11 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ isOpen, onClose, tarefaId }) 
                     <div className="task-info">
                         <p><strong>Título:</strong> {taskDetails.tarefaTitulo}</p>
                         <p><strong>Descrição:</strong> {taskDetails.tarefaDescricao}</p>
-                        <p><strong>Data de Conclusão:</strong> {taskDetails.tarefaDataConclusao}</p>
-                        <p><strong>Importância:</strong> {taskDetails.tarefaImportanciaPrioridade}</p>
+                        <p><strong>Data Limite:</strong> {formatDate(taskDetails.tarefaDataConclusao)}</p>
+                        <p><strong>Prioridade:</strong> {setPrioridadeString(taskDetails.tarefaPrioridade)}</p>
+                        <p><strong>Duração:</strong> {taskDetails.tarefaDuracao}</p>
+                        <p><strong>Categoria:</strong> {taskDetails.tarefaCategoria}</p>
+                        <p><strong>Fase do Dia:</strong> {taskDetails.tarefaFaseDoDia}</p>
                     </div>
                 )}
                 {feedbackDetails && (

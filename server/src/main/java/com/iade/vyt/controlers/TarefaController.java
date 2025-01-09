@@ -29,9 +29,14 @@ public class TarefaController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN); // Token inválido
         }
 
+        System.out.println("Recebido no Controller: " + tarefa);
+
         tarefaService.associateTarefaWithUser(tarefa, userId);
         tarefa.setTarefaCompletada(false);
         Tarefa createdTarefa = tarefaService.createTarefa(tarefa);
+
+        System.out.println("Enviado para o banco de dados: " + createdTarefa);
+
         return new ResponseEntity<>(createdTarefa, HttpStatus.CREATED);
     }
 
