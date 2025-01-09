@@ -6,27 +6,33 @@ import axiosInstance from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import Feedback from '../Feedback';
 
+
 interface TaskProps {
     taskId: number;
     title: string;
     description: string;
     conclusionDate: string;
-    importanciaPrioridade: string;
+    Prioridade: number;
 }
 
-const getImportantLabel = (importanciaPrioridade: string) => importanciaPrioridade;
-
-const getImportantColor = (importanciaPrioridade: string) => {
-    switch (importanciaPrioridade) {
-        case 'Alto':
-            return 'high-important';
-        case 'Médio':
-            return 'medium-important';
-        case 'Baixo':
-            return 'low-important';
-        default:
-            return 'default-important';
+const getImportantLabel = (Prioridade: number) => {
+    if (Prioridade === 1 || Prioridade === 2) {
+        return 'Baixo';
     }
+    if (Prioridade === 3) {
+        return 'Médio';
+    }
+    return 'Alto';
+};
+
+const getImportantColor = (Prioridade: number) => {
+    if (Prioridade === 1 || Prioridade === 2) {
+        return 'Baixo';
+    }
+    if (Prioridade === 3) {
+        return 'Médio';
+    }
+    return 'Alto';
 };
 
 const formatConclusaoAt = (dataConclusao: string | undefined): JSX.Element => {
@@ -48,9 +54,9 @@ const markTaskAsCompleted = async (taskId: number, token: string): Promise<void>
         const response = await axiosInstance.put(`/tarefa/complete/${taskId}`, {}, {
             headers: { Authorization: `Bearer ${token}` },
         });
-        console.log('Resposta da API ao completar tarefa:', response.status);
+        console.log('Resposta da API ao completar tarefa:', response.status, response.data);
     } catch (error: any) {
-        console.error('Erro ao marcar a tarefa como completada:', error);
+        console.error('Erro ao marcar a tarefa como completada:', error.response?.data || error.message);
     }
 };
 
@@ -72,11 +78,12 @@ const ContainerTask: React.FC<TaskProps> = ({
                                                 title,
                                                 description,
                                                 conclusionDate,
-                                                importanciaPrioridade,
+                                                Prioridade,
                                             }) => {
     const { token } = useContext(AuthContext); // Obtém o token do contexto
     const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+
 
     const handleClosePopup = () => {
         setIsEditPopupOpen(false);
@@ -91,28 +98,12 @@ const ContainerTask: React.FC<TaskProps> = ({
 
         try {
             await markTaskAsCompleted(taskId, token);
+            setIsFeedbackOpen(true);
         } catch (error) {
             console.error('Erro ao marcar a tarefa como completada:', error);
-        } finally {
-            setIsFeedbackOpen(true);
         }
     };
 
-    const handleFeedbackClose = async (rating: number | null, comment: string) => {
-        if (rating !== null) {
-            try {
-                // Enviar feedback ao backend
-                await axiosInstance.post(`/feedback/${taskId}`, {
-                    feedbackValor: rating,
-                    feedbackComentario: comment,
-                });
-                console.log(`Feedback para a tarefa ${taskId}: ${rating}/10, comentário: "${comment}"`);
-            } catch (error) {
-                console.error('Erro ao salvar feedback:', error);
-            }
-        }
-        setIsFeedbackOpen(false); // Fecha o pop-up de Feedback
-    };
 
     return (
         <>
@@ -120,9 +111,9 @@ const ContainerTask: React.FC<TaskProps> = ({
                 <div className="task-header">
                     <h4 className="task-title">{title}</h4>
                     <p
-                        className={`task-important ${getImportantColor(importanciaPrioridade)}`}
+                        className={`task-important ${getImportantColor(Prioridade)}`}
                     >
-                        {getImportantLabel(importanciaPrioridade)}
+                        {getImportantLabel(Prioridade)}
                     </p>
                 </div>
                 <p className="task-description">{description}</p>

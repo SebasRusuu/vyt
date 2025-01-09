@@ -7,22 +7,28 @@ interface TaskProps {
     title: string;
     description: string;
     conclusionDate: string;
-    importanciaPrioridade: string;
+    Prioridade: number;
 }
 
-const getImportantLabel = (importanciaPrioridade: string) => importanciaPrioridade;
-
-const getImportantColor = (importanciaPrioridade: string) => {
-    switch (importanciaPrioridade) {
-        case "Alto":
-            return "high-important";
-        case "Médio":
-            return "medium-important";
-        case "Baixo":
-            return "low-important";
-        default:
-            return "default-important";
+const getImportantLabel = (Prioridade: number) => {
+    if (Prioridade === 1 || Prioridade === 2) {
+        return 'Baixo';
     }
+    if (Prioridade === 3) {
+        return 'Médio';
+    }
+    return 'Alto';
+};
+
+const getImportantColor = (Prioridade: number) => {
+    if (Prioridade === 1 || Prioridade === 2) {
+        return "Baixo";
+    }
+    if (Prioridade === 3) {
+        return "Médio";
+    }
+    return "Alto";
+
 };
 
 const formatConclusaoAt = (dataConclusao: string | undefined): JSX.Element => {
@@ -43,7 +49,7 @@ const ContainerTaskCompleted: React.FC<TaskProps> = ({
                                                          title,
                                                          description,
                                                          conclusionDate,
-                                                         importanciaPrioridade,
+                                                         Prioridade,
                                                      }) => {
     const [isTaskDetailsOpen, setIsTaskDetailsOpen] = useState(false);
 
@@ -64,10 +70,10 @@ const ContainerTaskCompleted: React.FC<TaskProps> = ({
                     <p className="task-date">{formatConclusaoAt(conclusionDate)}</p>
                     <p
                         className={`task-important ${getImportantColor(
-                            importanciaPrioridade
+                            Prioridade
                         )}`}
                     >
-                        {getImportantLabel(importanciaPrioridade)}
+                        {getImportantLabel(Prioridade)}
                     </p>
                 </div>
             </div>

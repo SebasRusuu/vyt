@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
 import "./Feedback.css";
-import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../services/api";
+import { useNavigate } from "react-router-dom";
+
 
 interface FeedbackProps {
     isOpen: boolean;
     onClose: () => void;
     tarefaId: number; // ID da tarefa associada ao feedback
 }
+
+
 
 const Feedback: React.FC<FeedbackProps> = ({ isOpen, onClose, tarefaId }) => {
     const [rating, setRating] = useState<number | null>(null);
@@ -21,19 +24,22 @@ const Feedback: React.FC<FeedbackProps> = ({ isOpen, onClose, tarefaId }) => {
         if (rating === null) return;
 
         try {
-            // Enviar os dados do feedback para o backend
+            // Criar feedback e enviar para o backend
             await axiosInstance.post(`/feedback/${tarefaId}`, {
                 feedbackValor: rating,
                 feedbackComentario: comment,
             });
 
-            onClose(); // Fecha o modal após envio
-            navigate("/completed"); // Redireciona para a página de conclusão
+            // Após enviar o feedback, fechar o modal e atualizar a interface
+            navigate('/completed');
+            console.log(`[INFO] Feedback enviado com sucesso para a tarefa ${tarefaId}`);
         } catch (err: any) {
-            console.error("Erro ao enviar feedback:", err.message);
+            console.error("[ERROR] Erro ao enviar feedback:", err.message);
             setError("Erro ao enviar feedback. Tente novamente.");
         }
     };
+
+
 
     return (
         <div className="feedback-overlay" onClick={onClose}>

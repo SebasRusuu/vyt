@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import ResetEmail from './components/ResetEmail';
 import ResetPassword from './components/ResetPassword';
 import Completed from './pages/Completed';
+import Calendar from './pages/Calendar';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from './context/AuthContext';
 
@@ -48,6 +49,7 @@ function AppContent() {
                 <Route path="/reset-email" element={<ResetEmail />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/completed" element={<Completed />} />
+                <Route path="/calendar" element={<Calendar />} />
             </Routes>
         </div>
     );

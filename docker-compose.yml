@@ -10,6 +10,18 @@ x-postgres-common:
     retries: 5
 
 services:
+  ai_service:
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+    container_name: aiservice
+    ports:
+      - "5001:5001"
+    networks:
+      - app_net
+
+
+
   postgres_primary:
     <<: *postgres-common
     build:
@@ -126,6 +138,7 @@ services:
       SPRING_DATASOURCE_REPLICA_URL: jdbc:postgresql://DB_REPLICA:5432/vytdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: foobar
+      AI_SERVICE_URL: http://aiservice:5001
     env_file:
       - ./server/.env
     volumes:
@@ -146,6 +159,7 @@ services:
       SPRING_DATASOURCE_REPLICA_URL: jdbc:postgresql://DB_REPLICA:5432/vytdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: foobar
+      AI_SERVICE_URL: http://aiservice:5001
     env_file:
       - ./server/.env
     volumes:

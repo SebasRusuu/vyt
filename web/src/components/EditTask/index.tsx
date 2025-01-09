@@ -1,8 +1,7 @@
-import React, { useState, useEffect , useContext} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./EditTask.css"; // Estilos específicos do componente
 import { AuthContext } from "../../context/AuthContext";
 import axiosInstance from "../../services/api";
-
 
 interface EditTaskProps {
     taskId: number; // ID da tarefa a ser editada
@@ -13,14 +12,14 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
     const [formData, setFormData] = useState({
         tarefaTitulo: "",
         tarefaDescricao: "",
-        tarefaImportancia: "",
-        tarefaPrioridade: "",
-        tarefaPreferenciaTempo: "",
+        tarefaPrioridade: 0,
+        tarefaDuracao: "00:30:00", // Valor padrão
         tarefaDataConclusao: "",
+        tarefaCategoria: "",
+        tarefaFaseDoDia: "",
     });
     const [error, setError] = useState<string | null>(null);
     const { token } = useContext(AuthContext);
-
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -28,6 +27,13 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
+        });
+    };
+
+    const handlePriorityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({
+            ...formData,
+            tarefaPrioridade: parseInt(e.target.value),
         });
     };
 
@@ -49,10 +55,11 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
                 setFormData({
                     tarefaTitulo: task.tarefaTitulo,
                     tarefaDescricao: task.tarefaDescricao,
-                    tarefaImportancia: task.tarefaImportancia,
                     tarefaPrioridade: task.tarefaPrioridade,
-                    tarefaPreferenciaTempo: task.tarefaPreferenciaTempo,
+                    tarefaDuracao: task.tarefaDuracao,
                     tarefaDataConclusao: formatDate(task.tarefaDataConclusao),
+                    tarefaCategoria: task.tarefaCategoria,
+                    tarefaFaseDoDia: task.tarefaFaseDoDia,
                 });
             } catch (err: any) {
                 console.error("Erro ao carregar tarefa:", err.message);
@@ -63,40 +70,23 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
         loadTask();
     }, [taskId, token]);
 
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
 
+        const formattedData = {
+            ...formData,
+            tarefaDataConclusao: formData.tarefaDataConclusao.split("T")[0], // Remove horas, se existirem
+        }
+
         try {
-            // Determinar a combinação de Importância & Prioridade
-            let importanciaPrioridade = "Baixo";
-            if (
-                formData.tarefaImportancia === "Importante" &&
-                formData.tarefaPrioridade === "Urgente"
-            ) {
-                importanciaPrioridade = "Alto";
-            } else if (
-                formData.tarefaImportancia === "Importante" ||
-                formData.tarefaPrioridade === "Urgente"
-            ) {
-                importanciaPrioridade = "Médio";
-            }
-
-
             // Realizar o pedido PUT para atualizar a tarefa
             await axiosInstance.put(
-                `/tarefa/update/${taskId}`,
-                {
-                    tarefaTitulo: formData.tarefaTitulo,
-                    tarefaDescricao: formData.tarefaDescricao,
-                    tarefaImportanciaPrioridade: importanciaPrioridade,
-                    tarefaPreferenciaTempo: formData.tarefaPreferenciaTempo,
-                    tarefaDataConclusao: formData.tarefaDataConclusao,
-                },
+                `/tarefa/update/${taskId}`, formattedData,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
                     },
                 }
             );
@@ -107,9 +97,7 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
             console.error("Erro ao atualizar a tarefa:", err.message);
             setError("Erro ao atualizar a tarefa. Tente novamente.");
         }
-    }
-
-
+    };
 
     return (
         <div className="edit-task-overlay">
@@ -122,7 +110,6 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
                     style={{ float: "right" }}
                 ></button>
                 <form onSubmit={handleSubmit}>
-
                     <h2>Tarefa</h2>
                     {error && <p className="edit-task-error">{error}</p>}
                     <div className="edit-task-field">
@@ -147,32 +134,32 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
                             required
                         ></textarea>
                     </div>
-                    <div className="edit-task-field">
-                        <label htmlFor="tarefaImportancia">Importância</label>
-                        <select
-                            id="tarefaImportancia"
-                            name="tarefaImportancia"
-                            value={formData.tarefaImportancia}
-                            onChange={handleChange}
-                        >
-                            <option value="Pouco Importante">Pouco Importante</option>
-                            <option value="Importante">Importante</option>
-                        </select>
+                    <div className="edit-task-field rating">
+                        <label htmlFor="tarefaPrioridade" className="form-label">
+                            Prioridade
+                        </label>
+                        {[1, 2, 3, 4, 5].map((value) => (
+                            <label key={value}>
+                                <input
+                                    type="radio"
+                                    name="tarefaPrioridade"
+                                    value={value}
+                                    checked={formData.tarefaPrioridade === value}
+                                    onChange={handlePriorityChange}
+                                    style={{ display: "none" }}
+                                />
+                                <button
+                                    type="button"
+                                    className={formData.tarefaPrioridade === value ? "active" : ""}
+                                    onClick={() => setFormData({ ...formData, tarefaPrioridade: value })}
+                                >
+                                    {value}
+                                </button>
+                            </label>
+                        ))}
                     </div>
                     <div className="edit-task-field">
-                        <label htmlFor="tarefaPrioridade">Prioridade</label>
-                        <select
-                            id="tarefaPrioridade"
-                            name="tarefaPrioridade"
-                            value={formData.tarefaPrioridade}
-                            onChange={handleChange}
-                        >
-                            <option value="Não Urgente">Não Urgente</option>
-                            <option value="Urgente">Urgente</option>
-                        </select>
-                    </div>
-                    <div className="edit-task-field">
-                        <label htmlFor="tarefaDataConclusao">Data Prevista</label>
+                        <label htmlFor="tarefaDataConclusao">Data Limite</label>
                         <input
                             type="date"
                             id="tarefaDataConclusao"
@@ -182,26 +169,74 @@ const EditTask: React.FC<EditTaskProps> = ({ taskId, onClose }) => {
                         />
                     </div>
                     <div className="edit-task-field">
-                        <label htmlFor="tarefaPreferenciaTempo">Duração</label>
+                        <label htmlFor="tarefaDuracao" className="form-label">
+                            Duração
+                        </label>
                         <select
-                            id="tarefaPreferenciaTempo"
-                            name="tarefaPreferenciaTempo"
-                            value={formData.tarefaPreferenciaTempo}
+                            className="form-select"
+                            id="tarefaDuracao"
+                            name="tarefaDuracao"
+                            value={formData.tarefaDuracao}
                             onChange={handleChange}
                         >
                             <option value="00:30:00">30 minutos</option>
                             <option value="01:00:00">1 hora</option>
                             <option value="01:30:00">1h 30min</option>
                             <option value="02:00:00">2 horas</option>
+                            <option value="02:30:00">2h 30min</option>
+                            <option value="03:00:00">3 horas</option>
+                        </select>
+                    </div>
+                    <div className="edit-task-field">
+                        <label htmlFor="tarefaCategoria" className="form-label">
+                            Categoria
+                        </label>
+                        <select
+                            className="form-select"
+                            id="tarefaCategoria"
+                            name="tarefaCategoria"
+                            value={formData.tarefaCategoria}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Selecione a categoria</option>
+                            <option value="Trabalho">Trabalho</option>
+                            <option value="Saúde">Saúde</option>
+                            <option value="Lazer">Lazer</option>
+                            <option value="Estudos">Estudos</option>
+                            <option value="Casa">Casa</option>
+                            <option value="Social">Social</option>
+                            <option value="Financeiro">Financeiro</option>
+                            <option value="Desenvolvimento Pessoal">Desenvolvimento Pessoal</option>
+                            <option value="Viagens">Viagens</option>
+                            <option value="Recados">Recados</option>
+                        </select>
+                    </div>
+                    <div className="edit-task-field">
+                        <label htmlFor="tarefaFaseDoDia" className="form-label">
+                            Fase do dia
+                        </label>
+                        <select
+                            className="form-select"
+                            id="tarefaFaseDoDia"
+                            name="tarefaFaseDoDia"
+                            value={formData.tarefaFaseDoDia}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Selecione a fase do dia</option>
+                            <option value="Manhã">Manhã</option>
+                            <option value="Tarde">Tarde</option>
+                            <option value="Noite">Noite</option>
                         </select>
                     </div>
                     <button type="submit" className="edit-task-submit-btn">
                         Salvar Alterações
-
                     </button>
                 </form>
             </div>
         </div>
     );
 };
+
 export default EditTask;

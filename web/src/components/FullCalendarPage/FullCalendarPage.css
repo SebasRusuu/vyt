@@ -1,0 +1,37 @@
+/* Exemplo: FullCalendar assume a classe .fc para seus elementos */
+.fc {
+    /* se quiser ajustar a fonte do calendário */
+    font-family: Arial, sans-serif;
+}
+
+/* Exemplo de estilização para o timeGrid */
+.fc-timegrid-event {
+    background-color: #007bff;   /* cor do evento */
+    color: #fff;                 /* texto branco */
+    border: none;                /* sem borda */
+}
+/* Ajustar altura da célula de cada meia-hora */
+.fc-scroller-harness .fc-scroller,
+.fc-timegrid-slot {
+    min-height: 40px;
+}
+
+.fc-event-title {
+    font-weight: bold;
+}
+
+.fc-event-main {
+    white-space: normal; /* Permite múltiplas linhas */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adiciona "..." se o texto for muito longo */
+}
+
+.fc-timegrid-slot {
+    height: 3rem !important; /* Aumenta a altura das linhas horárias */
+}
+
+.fc-event {
+    min-height: 2rem; /* Garante que os eventos tenham altura mínima */
+    white-space: normal; /* Permite que o texto quebre para várias linhas */
+}
+

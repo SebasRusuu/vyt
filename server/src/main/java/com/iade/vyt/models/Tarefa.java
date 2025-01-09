@@ -6,7 +6,6 @@ import lombok.*;
 import java.sql.Time;
 import java.util.Date;
 
-
 @Entity
 @Table(name = "tarefas")
 @Data
@@ -30,16 +29,40 @@ public class Tarefa {
     @Column(name = "tarefa_descricao")
     private String tarefaDescricao;
 
-    @Column(name = "tarefa_importancia_prioridade")
-    private String tarefaImportanciaPrioridade;
+    @Column(name = "tarefa_prioridade")
+    private int tarefaPrioridade;
 
-    @Column(name = "tarefa_preferencia_tempo")
-    private Time tarefaPreferenciaTempo;
+    @Column(name = "tarefa_duracao")
+    private Time tarefaDuracao;
 
     @Column(name = "tarefa_data_conclusao")
     private Date tarefaDataConclusao;
 
+    @Column(name = "tarefa_categoria")
+    private String tarefaCategoria;
+
+    @Column(name = "tarefa_fasedodia")
+    private String tarefaFaseDoDia;
+
     @Column(name = "tarefa_completada")
     private boolean tarefaCompletada;
-}
 
+    @Column(name = "feedback_valor")
+    private Integer feedbackValor;
+
+    @Override
+    public String toString() {
+        return "Tarefa{" +
+                "tarefaId=" + tarefaId +
+                ", tarefaUser=" + tarefaUser +
+                ", tarefaTitulo='" + tarefaTitulo + '\'' +
+                ", tarefaDescricao='" + tarefaDescricao + '\'' +
+                ", tarefaPrioridade=" + tarefaPrioridade +
+                ", tarefaDuracao=" + tarefaDuracao +
+                ", tarefaDataConclusao=" + tarefaDataConclusao +
+                ", tarefaCategoria='" + tarefaCategoria + '\'' +
+                ", tarefaFaseDoDia='" + tarefaFaseDoDia + '\'' +
+                ", tarefaCompletada=" + tarefaCompletada +
+                '}';
+    }
+}
