@@ -21,48 +21,47 @@ const FullCalendarPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
+    const fetchCalendar = async () => {
+        if (isGenerating) return; // Evitar chamadas simultâneas
+
+        setIsGenerating(true);
+        try {
+            console.log("[INFO] Gerando calendário...");
+            await axiosInstance.post("/calendario/generate");
+
+            console.log("[INFO] Carregando calendário...");
+            const response = await axiosInstance.get("/calendario/user");
+            const data: BackendCalendario[] = response.data;
+
+            // Verificação dos dados recebidos
+            console.log("[DEBUG] Dados recebidos do backend:", data);
+
+            const fullCalendarEvents = data.map((item) => ({
+                title: item.tarefa?.tarefaTitulo || "Sem título",
+                start: mergeDateAndTime(item.data, item.horaInicio),
+                end: mergeDateAndTime(item.data, item.horaFim),
+                extendedProps: {
+                    descricao: item.tarefa?.tarefaDescricao,
+                    categoria: item.tarefa?.tarefaCategoria,
+                },
+            }));
+
+            setEvents(fullCalendarEvents);
+        } catch (err) {
+            console.error("[ERROR] Erro ao carregar o calendário:", err);
+            setError("Erro ao carregar o calendário. Por favor, tente novamente.");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
     useEffect(() => {
-        const fetchCalendar = async () => {
-            if (isGenerating || events.length > 0) return; // Impede chamadas repetidas
-
-            setIsGenerating(true);
-            try {
-                console.log("[INFO] Gerando calendário...");
-                await axiosInstance.post("/calendario/generate");
-
-                console.log("[INFO] Carregando calendário...");
-                const response = await axiosInstance.get("/calendario/user");
-                const data: BackendCalendario[] = response.data;
-
-                // Verificação dos dados recebidos
-                console.log("[DEBUG] Dados recebidos do backend:", data);
-
-                const fullCalendarEvents = data.map((item) => ({
-                    title: item.tarefa?.tarefaTitulo || "Sem título",
-                    start: mergeDateAndTime(item.data, item.horaInicio),
-                    end: mergeDateAndTime(item.data, item.horaFim),
-                    extendedProps: {
-                        descricao: item.tarefa?.tarefaDescricao,
-                        categoria: item.tarefa?.tarefaCategoria,
-                    },
-                }));
-
-                setEvents(fullCalendarEvents);
-            } catch (err) {
-                console.error("[ERROR] Erro ao carregar o calendário:", err);
-                setError("Erro ao carregar o calendário.");
-            } finally {
-                setIsGenerating(false);
-            }
-        };
-
         fetchCalendar();
-    }, []); // UseEffect sem dependências adicionais para ser executado apenas uma vez
+    }, []); // Executa apenas uma vez ao montar o componente
 
     const mergeDateAndTime = (dateStr: string, timeStr: string) => {
         if (!dateStr) return "";
-        const dateOnly = dateStr.split("T")[0]; // "2025-01-10"
-        return dateOnly + "T" + timeStr;        // "2025-01-10T08:00:00"
+        const dateOnly = dateStr.split("T")[0]; // Ex: "2025-01-10"
+        return dateOnly + "T" + timeStr;        // Ex: "2025-01-10T08:00:00"
     };
 
     return (
@@ -73,14 +72,14 @@ const FullCalendarPage: React.FC = () => {
             <FullCalendar
                 plugins={[timeGridPlugin]}
                 initialView="timeGridWeek"
-                slotDuration="00:30:00" // Define intervalos de 30 minutos entre slots
+                slotDuration="00:30:00" // Intervalos de 30 minutos entre slots
                 slotMinTime="07:00:00"
                 slotMaxTime="22:00:00"
                 allDaySlot={false}
                 nowIndicator={true}
                 events={events}
                 locale="pt-br"
-                height="auto" // Ajusta automaticamente a altura do calendário
+                height="auto" // Ajusta a altura automaticamente
                 headerToolbar={{
                     left: "prev,next today",
                     center: "title",

@@ -6,7 +6,6 @@ import axiosInstance from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 import Feedback from '../Feedback';
 
-
 interface TaskProps {
     taskId: number;
     title: string;
@@ -70,6 +69,7 @@ const deleteTask = async (taskId: number, token: string) => {
         return response.data;
     } catch (error: any) {
         console.error('Erro ao excluir a tarefa:', error);
+        throw error; // Retorna o erro para lidar com ele no chamado
     }
 };
 
@@ -83,7 +83,6 @@ const ContainerTask: React.FC<TaskProps> = ({
     const { token } = useContext(AuthContext); // Obtém o token do contexto
     const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
-
 
     const handleClosePopup = () => {
         setIsEditPopupOpen(false);
@@ -103,6 +102,26 @@ const ContainerTask: React.FC<TaskProps> = ({
             console.error('Erro ao marcar a tarefa como completada:', error);
         }
     };
+
+    const handleDeleteTask = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!token) {
+            console.log('Token não encontrado no contexto!');
+            return;
+        }
+        try {
+            await deleteTask(taskId, token);
+            console.log('Tarefa excluída com sucesso!');
+            window.location.reload();
+        } catch (error) {
+            if (error instanceof Error) {
+                console.error('Erro ao excluir a tarefa:', error.message);
+            } else {
+                console.error('Erro desconhecido:', error);
+            }
+        }
+    };
+
 
 
     return (
@@ -128,20 +147,7 @@ const ContainerTask: React.FC<TaskProps> = ({
                         </button>
                         <button
                             className="delete-task"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                if (token) {
-                                    deleteTask(taskId, token)
-                                        .then(() => {
-                                            window.location.reload();
-                                        })
-                                        .catch((error) => {
-                                            console.log(error.message);
-                                        });
-                                } else {
-                                    console.log('Token não encontrado no contexto!');
-                                }
-                            }}
+                            onClick={handleDeleteTask}
                         >
                             <FaTrashAlt />
                         </button>

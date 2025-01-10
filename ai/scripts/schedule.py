@@ -82,6 +82,7 @@ def generate_schedule(tasks, model, work_start=8, work_end=22, max_hours_per_day
         tasks.sort(
             key=lambda t: (-t["tarefaPrioridade"], datetime.strptime(t["tarefaDataConclusao"], "%Y-%m-%d"))
         )
+        print("[DEBUG] Tarefas ordenadas por prioridade e deadline:", tasks)
 
         for task in tasks:
             duration = convert_time_to_hours(task["tarefaDuracao"])
@@ -133,13 +134,11 @@ def generate_schedule(tasks, model, work_start=8, work_end=22, max_hours_per_day
             print("[DEBUG] Nenhuma tarefa pôde ser agendada devido a restrições.")
             return {"tasks": []}
 
-        # ---- PRINCIPAL CORREÇÃO AQUI ----
         # "Achatar" (flatten) o dicionário de dias numa lista de tasks
         flattened_tasks = []
-        id_counter = 1
+        id_counter = max((task.get("id", 0) for task in tasks), default=0) + 1
         for date_str, tasks_of_day in schedule.items():
             for t in tasks_of_day:
-                # Montar objeto "ScheduleTask" com date, horaInicio, horaFim...
                 flattened_tasks.append({
                     "id": id_counter,
                     "date": date_str,
@@ -148,7 +147,7 @@ def generate_schedule(tasks, model, work_start=8, work_end=22, max_hours_per_day
                 })
                 id_counter += 1
 
-        # Retornar no formato esperado pelo Java: { "tasks": [...] }
+        print("[DEBUG] Cronograma final gerado:", flattened_tasks)
         return {"tasks": flattened_tasks}
 
     except Exception as e:

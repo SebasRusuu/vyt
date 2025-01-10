@@ -54,8 +54,11 @@ const ContainerTaskCompleted: React.FC<TaskProps> = ({
     const [isTaskDetailsOpen, setIsTaskDetailsOpen] = useState(false);
 
     const handleOpenTaskDetails = () => {
-        setIsTaskDetailsOpen(true);
+        if (!isTaskDetailsOpen) {
+            setIsTaskDetailsOpen(true);
+        }
     };
+
 
     const handleCloseTaskDetails = () => {
         setIsTaskDetailsOpen(false);

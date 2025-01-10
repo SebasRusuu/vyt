@@ -3,6 +3,7 @@ package com.iade.vyt.services;
 
 import com.iade.vyt.models.Feedback;
 import com.iade.vyt.models.User;
+import com.iade.vyt.repositories.CalendarioRepository;
 import com.iade.vyt.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,21 @@ public class TarefaService {
     private final TarefaRepository tarefaRepository;
     private final UserRepository userRepository;
     private final FeedbackService feedbackService;
+    private final CalendarioRepository calendarioRepository;
 
-    public TarefaService(TarefaRepository tarefaRepository, UserRepository userRepository, FeedbackService feedbackService) {
+    public TarefaService(TarefaRepository tarefaRepository, UserRepository userRepository, FeedbackService feedbackService, CalendarioRepository calendarioRepository) {
         this.tarefaRepository = tarefaRepository;
         this.userRepository = userRepository;
         this.feedbackService = feedbackService;
+        this.calendarioRepository = calendarioRepository;
+    }
+
+    public void validateTasksExist(List<Integer> taskIds) {
+        for (Integer taskId : taskIds) {
+            if (!tarefaRepository.existsById(taskId)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada. ID: " + taskId);
+            }
+        }
     }
 
     public void associateTarefaWithUser(Tarefa tarefa, int userId) {
@@ -57,10 +68,18 @@ public class TarefaService {
 
 
     public void deleteTarefa(int tarefaId) {
-        Tarefa tarefa = tarefaRepository.findById(tarefaId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada."));
-        tarefaRepository.delete(tarefa);
+        // Excluir entradas relacionadas no calendário
+        calendarioRepository.findAll().stream()
+                .filter(c -> c.getTarefa().getTarefaId() == tarefaId)
+                .forEach(calendarioRepository::delete);
+
+        // Excluir a tarefa após limpar referências
+        if (!tarefaRepository.existsById(tarefaId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada.");
+        }
+        tarefaRepository.deleteById(tarefaId);
     }
+
 
     public Tarefa createTarefa(Tarefa tarefa) {
         System.out.println("Salvando no banco de dados: " + tarefa);

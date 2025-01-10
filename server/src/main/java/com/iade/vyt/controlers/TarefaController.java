@@ -104,17 +104,19 @@ public class TarefaController {
 
 
     @DeleteMapping("/delete/{tarefaId}")
-    public ResponseEntity<Void> deleteTarefa(@PathVariable int tarefaId, HttpServletRequest request) {
+    public ResponseEntity<String> deleteTarefa(@PathVariable int tarefaId, HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("user_id");
 
         if (userId == null) {
-            System.out.println("Erro: User ID não encontrado. Token inválido ou usuário não autenticado.");
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("Usuário não autenticado.", HttpStatus.FORBIDDEN);
         }
 
-        tarefaService.deleteTarefa(tarefaId);
-        System.out.println("Tarefa excluída com sucesso.");
-        return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            tarefaService.deleteTarefa(tarefaId);
+            return ResponseEntity.ok("Tarefa excluída com sucesso.");
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(e.getReason(), e.getStatusCode()); // Alterado para getStatusCode
+        }
     }
 
 
@@ -141,8 +143,13 @@ public class TarefaController {
         }
 
         Tarefa tarefa = tarefaService.getTarefaById(tarefaId);
+        if (tarefa.getTarefaUser().getUserId() != userId) {
+            return new ResponseEntity<>("A tarefa não pertence ao usuário autenticado.", HttpStatus.FORBIDDEN);
+        }
+
         return ResponseEntity.ok(tarefa);
     }
-    
+
+
 }
 

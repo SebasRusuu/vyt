@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/calendario")
@@ -29,7 +28,6 @@ public class CalendarioController {
             System.err.println("[ERROR] Usuário não autenticado.");
             return new ResponseEntity<>("Usuário não autenticado.", HttpStatus.FORBIDDEN);
         }
-
         try {
             calendarioService.generateSchedule(userId);
             System.out.println("[INFO] Calendário gerado com sucesso para userId: " + userId);
@@ -43,7 +41,7 @@ public class CalendarioController {
     @GetMapping("/user")
     public ResponseEntity<?> getUserSchedule(HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("user_id");
-        System.out.println("[INFO] GET /user chamado por userId: " + userId);
+        System.out.println("[INFO] GET /user chamado para userId: " + userId);
 
         if (userId == null) {
             System.err.println("[ERROR] Usuário não autenticado.");
@@ -51,14 +49,15 @@ public class CalendarioController {
         }
 
         try {
-            List<Calendario> schedule = calendarioService.getUserSchedule(userId); // Já retorna filtrado
-            System.out.println("[INFO] Retornando calendário para userId: " + userId);
+            List<Calendario> schedule = calendarioService.getUserSchedule(userId);
+            System.out.println("[DEBUG] Calendário retornado para userId " + userId + ": " + schedule);
             return ResponseEntity.ok(schedule);
         } catch (Exception e) {
-            System.err.println("[ERROR] Falha ao buscar calendário: " + e.getMessage());
+            System.err.println("[ERROR] Erro ao buscar o calendário: " + e.getMessage());
             return new ResponseEntity<>("Erro ao buscar o calendário: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
 
