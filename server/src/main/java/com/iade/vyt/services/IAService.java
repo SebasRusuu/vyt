@@ -26,20 +26,22 @@ public class IAService {
 
     public ScheduleResponse generateSchedule(List<Tarefa> tarefas) {
         String url = "http://aiservice:5001/generate-schedule";
-        System.out.println("[INFO] Chamando IA com tarefas: " + tarefas);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        List<Map<String, Object>> tarefasFormatted = tarefas.stream().map(tarefa -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("tarefaTitulo", tarefa.getTarefaTitulo());
-            map.put("tarefaDuracao", tarefa.getTarefaDuracao().toString());
-            map.put("tarefaDataConclusao", dateFormat.format(tarefa.getTarefaDataConclusao())); // Apenas a data
-            map.put("tarefaPrioridade", tarefa.getTarefaPrioridade());
-            map.put("tarefaCategoria", tarefa.getTarefaCategoria());
-            map.put("tarefaFaseDoDia", tarefa.getTarefaFaseDoDia());
-            map.put("tarefaCompletada", tarefa.isTarefaCompletada());
-            return map;
-        }).collect(Collectors.toList());
+        // Garantir que tarefas incompletas estão sendo enviadas
+        List<Map<String, Object>> tarefasFormatted = tarefas.stream()
+                .filter(tarefa -> !tarefa.isTarefaCompletada())
+                .map(tarefa -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("tarefaTitulo", tarefa.getTarefaTitulo());
+                    map.put("tarefaDuracao", tarefa.getTarefaDuracao().toString());
+                    map.put("tarefaDataConclusao", new SimpleDateFormat("yyyy-MM-dd").format(tarefa.getTarefaDataConclusao()));
+                    map.put("tarefaPrioridade", tarefa.getTarefaPrioridade());
+                    map.put("tarefaCategoria", tarefa.getTarefaCategoria());
+                    map.put("tarefaFaseDoDia", tarefa.getTarefaFaseDoDia());
+                    map.put("tarefaCompletada", tarefa.isTarefaCompletada());
+                    return map;
+                })
+                .toList();
 
         System.out.println("[DEBUG] Dados formatados para IA: " + tarefasFormatted);
 
@@ -57,7 +59,6 @@ public class IAService {
             throw e;
         }
     }
-
 
     public void trainModel(List<Tarefa> completedTasks) {
         String url = "http://aiservice:5001/train"; // Endpoint para treinar o modelo

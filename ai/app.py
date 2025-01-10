@@ -24,7 +24,8 @@ def generate_schedule_api():
 
         tasks = user_data.get("tasks", [])
         if not tasks:
-            raise ValueError("Nenhuma tarefa fornecida.")
+            print("[INFO] Nenhuma tarefa fornecida para o utilizador.")
+            return jsonify({"tasks": []}), 200
 
         # Validação de campos obrigatórios
         required_fields = [
@@ -39,21 +40,20 @@ def generate_schedule_api():
         for task in tasks:
             for field in required_fields:
                 if field not in task:
-                    raise KeyError(f"Campo '{field}' ausente na tarefa: {task}")
+                    print(f"[ERROR] Campo '{field}' ausente na tarefa: {task}")
+                    return jsonify({"error": f"Campo '{field}' ausente na tarefa: {task}"}), 400
 
-        # Gerar cronograma (retorno agora vem já no formato {"tasks": [...]})
+        # Gerar cronograma
         schedule = generate_schedule(tasks, model)
+        print("[DEBUG] Cronograma gerado pela IA:", schedule)
 
-        # schedule já é um dicionário com a chave "tasks", compatível com seu Java
         return jsonify(schedule), 200
 
-    except KeyError as ke:
-        print(f"[ERROR] Campo faltando: {ke}")
-        return jsonify({"error": f"Campo faltando: {str(ke)}"}), 400
     except Exception as e:
         print("[ERROR] Exception occurred:")
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
+
 
 
 @app.route("/train", methods=["POST"])

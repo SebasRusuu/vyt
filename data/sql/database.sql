@@ -37,5 +37,5 @@ CREATE TABLE IF NOT EXISTS calendario(
      hora_inicio TIME NOT NULL,
      hora_fim TIME NOT NULL,
      FOREIGN KEY (user_id) REFERENCES uservyt(user_id),
-     FOREIGN KEY (tarefa_id) REFERENCES tarefas(tarefa_id)
+     FOREIGN KEY (tarefa_id) REFERENCES tarefas(tarefa_id) ON DELETE CASCADE
     );

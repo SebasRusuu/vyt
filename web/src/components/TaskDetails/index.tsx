@@ -29,15 +29,13 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ isOpen, onClose, tarefaId }) 
     };
 
     useEffect(() => {
-        if (!isOpen) return;
+        if (!isOpen || !tarefaId) return; // Apenas busca quando o pop-up está aberto e o ID está disponível
 
         const fetchDetails = async () => {
             try {
-                // Buscar informações da tarefa
                 const taskResponse = await axiosInstance.get(`/tarefa/id/${tarefaId}`);
                 setTaskDetails(taskResponse.data);
 
-                // Buscar informações do feedback
                 const feedbackResponse = await axiosInstance.get(`/feedback/tarefa/${tarefaId}`);
                 setFeedbackDetails(feedbackResponse.data);
             } catch (err: any) {
