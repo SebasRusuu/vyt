@@ -19,6 +19,9 @@ services:
       - "5001:5001"
     networks:
       - app_net
+    volumes:
+      - ./ai/models:/app/models
+      - ./ai/test_api.py:/app/test_api.py
 
 
 

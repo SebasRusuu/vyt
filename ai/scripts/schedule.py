@@ -1,45 +1,46 @@
-import traceback
-from .train import predict_task_schedule
+# schedule.py
 from datetime import datetime, timedelta
+import traceback
+from .utils import encode_phase_of_day, convert_time_to_hours, format_time
+from .train import predict_task_time, round_to_nearest_interval
 
-def convert_time_to_hours(duration_str):
-    """Converte 'hh:mm:ss' para horas decimais ou retorna diretamente se já for float."""
-    if isinstance(duration_str, float):
-        return duration_str
-    time_parts = list(map(int, duration_str.split(":")))
-    return time_parts[0] + time_parts[1] / 60 + time_parts[2] / 3600
-
-def format_time(decimal_time):
-    """Converte tempo decimal (e.g., 10.5) para o formato HH:MM."""
-    hours = int(decimal_time)
-    minutes = int((decimal_time - hours) * 60)
-    return f"{hours:02}:{minutes:02}"
-
-def can_schedule(day, start_slot, duration, phase, task_category, schedule, phase_slots, hours_per_day, max_hours_per_day, time_slots):
-    """Verifica se a tarefa pode ser alocada."""
-    slots_needed = int(duration * 2)
+def can_schedule(day, start_slot, duration, phase_slots, time_slots):
+    slots_needed = int(duration * 2)  # Cada slot representa 30 minutos
     end_slot = start_slot + slots_needed
-
-    # Restrições simples de fase, horas/dia e se já está ocupado
-    if start_slot < phase_slots[phase][0] or end_slot > phase_slots[phase][1]:
-        return False
-    if hours_per_day[day] + duration > max_hours_per_day:
+    if start_slot < phase_slots[0] or end_slot > phase_slots[1]:
+        print(f"[DEBUG] Falha na verificação de slots: start_slot={start_slot}, end_slot={end_slot}, phase_slots={phase_slots}")
         return False
     if not all(not time_slots[day][i] for i in range(start_slot, end_slot)):
+        print(f"[DEBUG] Slots ocupados detectados entre {start_slot} e {end_slot} no dia {day}")
         return False
-    # Exemplo de restrição: não alocar 2 vezes seguidas a mesma categoria no mesmo dia
-    if schedule[day]:
-        last_task = schedule[day][-1]
-        if last_task["tarefaCategoria"] == task_category:
-            return False
-
     return True
 
-def generate_schedule(tasks, model, work_start=8, work_end=22, max_hours_per_day=8):
-    """
-    Organiza as tarefas respeitando prioridade, deadline, feedback e fase do dia.
-    Retorna SEMPRE no formato {"tasks": [...]}, para ser compatível com o Java.
-    """
+def schedule_task(day, start_slot, duration, phase_slots, time_slots, schedule, task):
+    try:
+        task_end_slot = start_slot + int(float(duration) * 2)
+        if start_slot < phase_slots[0] or task_end_slot > phase_slots[1]:
+            print(f"[DEBUG] Limites de fase do dia não atendidos para a tarefa {task['tarefaTitulo']}.")
+            return False
+        if not all(not time_slots[day][i] for i in range(start_slot, task_end_slot)):
+            print(f"[DEBUG] Slots ocupados para a tarefa {task['tarefaTitulo']} no dia {day}.")
+            return False
+
+        for i in range(start_slot, task_end_slot):
+            time_slots[day][i] = True
+
+        schedule[day].append({
+            "tarefaTitulo": task["tarefaTitulo"],
+            "start": format_time(8 + start_slot / 2),
+            "end": format_time(8 + task_end_slot / 2),
+            "tarefaCategoria": task["tarefaCategoria"],
+        })
+        print(f"[DEBUG] Tarefa '{task['tarefaTitulo']}' agendada no dia {day} das {format_time(8 + start_slot / 2)} às {format_time(8 + task_end_slot / 2)}.")
+        return True
+    except Exception as e:
+        print(f"[ERROR] Falha ao agendar tarefa: {e}")
+        return False
+
+def generate_schedule(tasks, model, completed_tasks, work_start=8, work_end=22, max_hours_per_day=8):
     try:
         if not tasks:
             print("[DEBUG] Nenhuma tarefa recebida pela IA.")
@@ -49,107 +50,65 @@ def generate_schedule(tasks, model, work_start=8, work_end=22, max_hours_per_day
         end_date = max(datetime.strptime(t["tarefaDataConclusao"], "%Y-%m-%d").date() for t in tasks)
         days = [start_date + timedelta(days=i) for i in range((end_date - start_date).days + 1)]
 
-        print(f"[DEBUG] Gerando calendário para {len(tasks)} tarefas entre {start_date} e {end_date}.")
+        print(f"[DEBUG] Dias calculados para agendamento: {days}")
 
-        # Validação dos campos obrigatórios
-        required_fields = [
-            "tarefaTitulo", "tarefaDuracao", "tarefaDataConclusao",
-            "tarefaPrioridade", "tarefaCategoria", "tarefaFaseDoDia", "tarefaCompletada"
-        ]
-        for task in tasks:
-            for field in required_fields:
-                if field not in task:
-                    raise KeyError(f"Campo '{field}' ausente na tarefa: {task}")
-
-        # Dicionário: day -> lista de alocações
         schedule = {day.isoformat(): [] for day in days}
-        hours_per_day = {day.isoformat(): 0 for day in days}
+        time_slots = {day.isoformat(): [False] * ((work_end - work_start) * 2) for day in days}
 
-        # Fases do dia, traduzidas em slots (0 = 8h, 1 = 8h30, etc.)
-        phase_slots = {
-            "Manhã": (0, int((13 - work_start) * 2)),   # 8h -> 13h
-            "Tarde": (int((13 - work_start) * 2), int((18 - work_start) * 2)),  # 13h -> 18h
-            "Noite": (int((18 - work_start) * 2), int((work_end - work_start) * 2)),  # 18h -> 22h
-        }
-
-        # time_slots[ day ][ slot ] = False/True
-        time_slots = {
-            day.isoformat(): [False] * ((work_end - work_start) * 2)
-            for day in days
-        }
-
-        # Ordenar por prioridade (desc) e deadline (asc)
+        # Ordenar tarefas por prioridade e data de conclusão
         tasks.sort(
             key=lambda t: (-t["tarefaPrioridade"], datetime.strptime(t["tarefaDataConclusao"], "%Y-%m-%d"))
         )
-        print("[DEBUG] Tarefas ordenadas por prioridade e deadline:", tasks)
+        print(f"[DEBUG] Tarefas após ordenação: {tasks}")
 
         for task in tasks:
-            duration = convert_time_to_hours(task["tarefaDuracao"])
-            phase = task.get("tarefaFaseDoDia", "Manhã")  # fallback Manhã
-            deadline_date = datetime.strptime(task["tarefaDataConclusao"], "%Y-%m-%d").date()
+            print(f"[DEBUG] Processando tarefa: {task['tarefaTitulo']}")
+            phase = encode_phase_of_day(task.get("tarefaFaseDoDia", "Manhã"))
+            phase_slots = {
+                1: (0, 10),   # Manhã: 08:00 - 13:00 -> 10 slots
+                2: (10, 20),  # Tarde: 13:00 - 18:00 -> 10 slots
+                3: (20, 28),  # Noite: 18:00 - 22:00 -> 8 slots
+            }.get(phase, (0, 28))
+            print(f"[DEBUG] Fase do dia: {task.get('tarefaFaseDoDia', 'Manhã')} codificada como {phase} com phase_slots {phase_slots}")
 
-            best_day, best_slot, best_feedback = None, None, float("-inf")
+            duration = convert_time_to_hours(task["tarefaDuracao"])
+            print(f"[DEBUG] Duração da tarefa '{task['tarefaTitulo']}': {duration} horas")
+
+            predicted_time = predict_task_time(task, completed_tasks, model)
+            print(f"[DEBUG] Horário previsto para '{task['tarefaTitulo']}': {predicted_time} (em horas decimais)")
+
+            rounded_time = round_to_nearest_interval(predicted_time)
+            print(f"[DEBUG] Horário arredondado para intervalo mais próximo: {rounded_time}")
+
+            task_start_slot = int((rounded_time - work_start) * 2)
+            print(f"[DEBUG] Slot inicial calculado para '{task['tarefaTitulo']}': {task_start_slot}")
+
+            # Dentro do loop for day in days em generate_schedule:
 
             for day in days:
                 day_str = day.isoformat()
+                print(f"[DEBUG] Tentando agendar '{task['tarefaTitulo']}' no dia {day_str}")
 
-                # Penalização por atraso
-                delay_penalty = max(0, (day - deadline_date).days)
+                if day == start_date:
+                    current_time = datetime.now()
+                    current_time_slot = int(((current_time.hour + current_time.minute/60) - work_start) * 2)
+                    # Verifica se ainda há slots disponíveis na fase atual
+                    if current_time_slot < phase_slots[1]:
+                        phase_slots = (max(phase_slots[0], current_time_slot), phase_slots[1])
+                        print(f"[DEBUG] Ajuste de phase_slots para o dia atual: {phase_slots}")
+                    else:
+                        print(f"[DEBUG] Nenhum slot disponível hoje após {current_time.hour}:{current_time.minute}. Pulando para o próximo dia.")
+                        continue  # Pula o dia atual se não houver slots disponíveis
 
-                start_slot, end_slot = phase_slots[phase]
-                for slot in range(start_slot, end_slot):
-                    if can_schedule(day_str, slot, duration, phase, task["tarefaCategoria"],
-                                    schedule, phase_slots, hours_per_day, max_hours_per_day, time_slots):
-                        temp_task = task.copy()
-                        temp_task["tarefaDuracao"] = duration
-                        predicted_feedback = predict_task_schedule(temp_task, model)
+                if schedule_task(day_str, task_start_slot, float(duration), phase_slots, time_slots, schedule, task):
+                    print(f"[DEBUG] Tarefa '{task['tarefaTitulo']}' agendada com sucesso no dia {day_str}")
+                    break
+                else:
+                    print(f"[DEBUG] Não foi possível agendar '{task['tarefaTitulo']}' no dia {day_str}")
 
-                        # Subtrai penalidade (tarefa atrasada) do feedback
-                        predicted_feedback -= delay_penalty
 
-                        if predicted_feedback > best_feedback:
-                            best_day, best_slot, best_feedback = day_str, slot, predicted_feedback
-
-            if best_day and best_slot is not None:
-                start_time = work_start + best_slot / 2
-                end_time = start_time + duration
-
-                schedule[best_day].append({
-                    "tarefaTitulo": task["tarefaTitulo"],
-                    "start": format_time(start_time),
-                    "end": format_time(end_time),
-                    "phase": phase,
-                    "tarefaCategoria": task["tarefaCategoria"],
-                    "tarefaCompletada": task.get("tarefaCompletada", False)
-                })
-
-                for i in range(best_slot, best_slot + int(duration * 2)):
-                    time_slots[best_day][i] = True
-
-                hours_per_day[best_day] += duration
-
-        # Se, ao final, não alocamos nada
-        if not any(schedule.values()):
-            print("[DEBUG] Nenhuma tarefa pôde ser agendada devido a restrições.")
-            return {"tasks": []}
-
-        # "Achatar" (flatten) o dicionário de dias numa lista de tasks
-        flattened_tasks = []
-        id_counter = max((task.get("id", 0) for task in tasks), default=0) + 1
-        for date_str, tasks_of_day in schedule.items():
-            for t in tasks_of_day:
-                flattened_tasks.append({
-                    "id": id_counter,
-                    "date": date_str,
-                    "horaInicio": t["start"] + ":00",  # Ex: "08:00:00"
-                    "horaFim": t["end"] + ":00",       # Ex: "09:30:00"
-                })
-                id_counter += 1
-
-        print("[DEBUG] Cronograma final gerado:", flattened_tasks)
-        return {"tasks": flattened_tasks}
-
+        print(f"[DEBUG] Cronograma final: {schedule}")
+        return {"tasks": [t for day in schedule.values() for t in day]}
     except Exception as e:
         print("[ERROR] Erro ao gerar calendário:", e)
         traceback.print_exc()

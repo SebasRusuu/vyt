@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../services/api";
-
-// FullCalendar
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 
 interface BackendCalendario {
-    data: string;        // ex: "2025-01-10T00:00:00"
-    horaInicio: string;  // ex: "08:00:00"
-    horaFim: string;     // ex: "09:30:00"
+    data: string;
+    horaInicio: string;
+    horaFim: string;
     tarefa: {
         tarefaTitulo: string;
         tarefaDescricao: string;
@@ -21,10 +19,16 @@ const FullCalendarPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
-    const fetchCalendar = async () => {
-        if (isGenerating) return; // Evitar chamadas simultâneas
+    const mergeDateAndTime = (dateStr: string, timeStr: string) => {
+        if (!dateStr) return "";
+        const dateOnly = dateStr.split("T")[0];
+        return dateOnly + "T" + timeStr;
+    };
 
+    const fetchCalendar = async () => {
+        if (isGenerating) return;
         setIsGenerating(true);
+
         try {
             console.log("[INFO] Gerando calendário...");
             await axiosInstance.post("/calendario/generate");
@@ -33,7 +37,6 @@ const FullCalendarPage: React.FC = () => {
             const response = await axiosInstance.get("/calendario/user");
             const data: BackendCalendario[] = response.data;
 
-            // Verificação dos dados recebidos
             console.log("[DEBUG] Dados recebidos do backend:", data);
 
             const fullCalendarEvents = data.map((item) => ({
@@ -46,40 +49,37 @@ const FullCalendarPage: React.FC = () => {
                 },
             }));
 
+            // Atualiza os eventos, garantindo que não haja duplicatas
             setEvents(fullCalendarEvents);
-        } catch (err) {
+        } catch (err: any) {
             console.error("[ERROR] Erro ao carregar o calendário:", err);
             setError("Erro ao carregar o calendário. Por favor, tente novamente.");
         } finally {
             setIsGenerating(false);
         }
     };
+
     useEffect(() => {
         fetchCalendar();
-    }, []); // Executa apenas uma vez ao montar o componente
-
-    const mergeDateAndTime = (dateStr: string, timeStr: string) => {
-        if (!dateStr) return "";
-        const dateOnly = dateStr.split("T")[0]; // Ex: "2025-01-10"
-        return dateOnly + "T" + timeStr;        // Ex: "2025-01-10T08:00:00"
-    };
+        // Executa apenas uma vez na montagem do componente
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div style={{ flex: 1, padding: "1rem" }}>
             <h1>Calendário Semanal</h1>
             {error && <p style={{ color: "red" }}>{error}</p>}
-
             <FullCalendar
                 plugins={[timeGridPlugin]}
                 initialView="timeGridWeek"
-                slotDuration="00:30:00" // Intervalos de 30 minutos entre slots
+                slotDuration="00:30:00"
                 slotMinTime="07:00:00"
                 slotMaxTime="22:00:00"
                 allDaySlot={false}
                 nowIndicator={true}
                 events={events}
                 locale="pt-br"
-                height="auto" // Ajusta a altura automaticamente
+                height="auto"
                 headerToolbar={{
                     left: "prev,next today",
                     center: "title",
